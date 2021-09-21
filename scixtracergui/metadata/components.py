@@ -267,7 +267,7 @@ class SgMetadataExperimentComponent(SgComponent):
         layout = QGridLayout()
         self.widget.setLayout(layout)
 
-        title = QLabel(self.widget.tr("Experiment informations"))
+        title = QLabel(self.widget.tr("Experiment information"))
         title.setObjectName("SgLabelFormHeader1")
         title.setMaximumHeight(50)
 

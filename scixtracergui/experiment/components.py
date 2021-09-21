@@ -331,7 +331,11 @@ class SgExperimentTableComponent(SgComponent):
             self.tableWidget.setItem(i, col_idx,
                                      QTableWidgetItem(raw_metadata.date))
 
-    def cellClicked(self, row : int, col : int):
+    def datasetClicked(self, name: str):
+        self.container.dataset_name = name
+        self.container.emit(SgExperimentStates.DatasetChanged)
+
+    def cellClicked(self, row: int, col: int):
         self.container.selected_data_info = self.container.dataset.uris[row]
         self.highlightLine(row)
         if self.container.dataset_name == 'data':

@@ -1,24 +1,25 @@
 import sys
 import os
 
-from qtpy.QtGui import QIcon
-from qtpy.QtWidgets import QApplication
-
 import qtpy.QtCore
+from qtpy.QtGui import QIcon
 from qtpy.QtWidgets import (QApplication, QWidget, QVBoxLayout,
-                            QLabel, QTabWidget, QHBoxLayout)
+                            QLabel, QTabWidget, QHBoxLayout, QMessageBox)
 
 from scixtracergui.framework import SgAction, SgComponent
 
-from scixtracergui.experiment.states import (SgExperimentStates,
-                                             SgExperimentCreateStates)
-from scixtracergui.experiment.containers import (SgExperimentContainer)
+from scixtracergui.experiment.states import SgExperimentStates
+from scixtracergui.experiment.containers import SgExperimentContainer
 from scixtracergui.experiment.components import (SgExperimentToolbarComponent,
                                                  SgExperimentTableComponent,
                                                  SgExperimentImportComponent,
                                                  SgExperimentTagComponent)
-from scixtracergui.experiment.models import (SgExperimentModel)
-                                            
+from scixtracergui.experiment.models import SgExperimentModel
+from scixtracergui.metadata.containers import SgMetadataExperimentContainer
+from scixtracergui.metadata.components import SgMetadataExperimentComponent
+from scixtracergui.metadata.models import SgMetadataExperimentModel
+from scixtracergui.metadata.states import SgMetadataExperimentStates
+
 
 class SgExperimentApp(SgComponent):
     def __init__(self, experiment_uri: str):
@@ -26,6 +27,7 @@ class SgExperimentApp(SgComponent):
 
         # container
         self.expContainer = SgExperimentContainer()
+        self.infoContainer = SgMetadataExperimentContainer()
         
         # components
         self.toolbarComponent = SgExperimentToolbarComponent(self.expContainer)
@@ -33,8 +35,11 @@ class SgExperimentApp(SgComponent):
         self.importComponent = SgExperimentImportComponent(self.expContainer)
         self.tagComponent = SgExperimentTagComponent(self.expContainer)
 
+        self.infoComponent = SgMetadataExperimentComponent(self.infoContainer)
+
         # models
         self.experimentModel = SgExperimentModel(self.expContainer)
+        self.infoModel = SgMetadataExperimentModel(self.infoContainer)
 
         # connections
         self.expContainer.register(self)
@@ -66,6 +71,24 @@ class SgExperimentApp(SgComponent):
         if action.state == SgExperimentStates.ProcessedDataClicked:
             print('You clicked the PROCESSED data:',
                   self.expContainer.selected_data_info.md_uri)
+        if action.state == SgExperimentStates.EditInfoClicked:
+            self.infoComponent.get_widget().setVisible(True)
+        if action.state == SgExperimentStates.TagClicked:
+            self.tagComponent.get_widget().setVisible(True)
+        if action.state == SgExperimentStates.ExperimentLoaded:
+            self.infoContainer.md_uri = self.expContainer.experiment_uri
+            self.infoContainer.experiment = self.expContainer.experiment
+            self.infoContainer.emit(SgMetadataExperimentStates.Loaded)
+        if action.state == SgExperimentStates.TagsSaved or \
+                action.state == SgExperimentStates.DataTagged:
+            self.tagComponent.get_widget().setVisible(False)
+            msgBox = QMessageBox()
+            msgBox.setText("Tags saved")
+            msgBox.exec()
+            self.tableComponent.datasetClicked('data')
+            return
+        if action.state == SgExperimentStates.ImportClicked:
+            self.importComponent.get_widget().setVisible(True)
 
     def get_widget(self):
         return self.widget

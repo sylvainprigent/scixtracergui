@@ -16,8 +16,7 @@ class SgExperimentModel(SgModel):
         self.req = sx.Request()
 
     def update(self, action: SgAction):
-        if action.state == SgExperimentStates.ExperimentLoad or \
-                action.state == SgExperimentStates.RefreshClicked:
+        if action.state == SgExperimentStates.ExperimentLoad:
             self.container.experiment = self.req.get_experiment(
                 self.container.experiment_uri)
             self.container.dataset = self.req.get_dataset(
@@ -26,7 +25,8 @@ class SgExperimentModel(SgModel):
             self.container.dataset_name = 'data'
             self.container.emit(SgExperimentStates.ExperimentLoaded)
 
-        if action.state == SgExperimentStates.DatasetChanged:
+        if action.state == SgExperimentStates.DatasetChanged or \
+                action.state == SgExperimentStates.RefreshClicked:
             self.container.dataset = self.req.get_dataset(
                                  self.container.experiment,
                                  self.container.dataset_name)
