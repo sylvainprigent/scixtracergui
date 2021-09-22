@@ -29,3 +29,8 @@ class SgExperimentCreateStates(SgStates):
     CancelClicked = "SgExperimentCreateStates.CancelClicked"
     ExperimentCreated = "SgExperimentCreateStates.ExperimentCreated"
     ExperimentCreationError = "SgExperimentCreateStates.ExperimentCreationError"
+
+
+class SgExperimentHomeStates(SgStates):
+    NewClicked = "SgExperimentHomeStates.NewClicked"
+    OpenClicked = "SgExperimentHomeStates.OpenClicked"

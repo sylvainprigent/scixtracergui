@@ -39,7 +39,7 @@ class SgExperimentModel(SgModel):
                 name=self.container.import_info.file_name,
                 author=self.container.import_info.author,
                 format_=self.container.import_info.format,
-                date=self.container.import_info.createddate,
+                date=self.container.import_info.created_date,
                 tags=dict,
                 copy=self.container.import_info.file_copy_data
             )
@@ -60,7 +60,7 @@ class SgExperimentModel(SgModel):
                 filter_=filter_regexp,
                 author=self.container.import_info.author,
                 format_=self.container.import_info.format,
-                date=self.container.import_info.createddate,
+                date=self.container.import_info.created_date,
                 copy_data=self.container.import_info.dir_copy_data
             )
             self.container.emit(SgExperimentStates.DataImported)

@@ -1,7 +1,7 @@
 from scixtracergui.framework import SgContainer
 
 
-class SgExperimentImportContainer():
+class SgExperimentImportContainer:
     def __init__(self):
         super().__init__()
         self.dir_data_path = ''
@@ -28,6 +28,12 @@ class SgExperimentTagContainer:
         self.usingseparator_position = []
         self.usingname_tag = ''
         self.usingname_search = []
+
+
+class SgExperimentHomeContainer(SgContainer):
+    def __init__(self):
+        super().__init__()
+        self.clicked_button = ''
 
 
 class SgExperimentContainer(SgContainer):

@@ -9,9 +9,48 @@ import scixtracer as sx
 from scixtracergui.framework import SgComponent, SgAction
 from scixtracergui.widgets import SgTagWidget
 from scixtracergui.experiment.containers import (SgExperimentCreateContainer,
-                                                 SgExperimentContainer)
+                                                 SgExperimentContainer,
+                                                 SgExperimentHomeContainer)
 from scixtracergui.experiment.states import (SgExperimentCreateStates,
-                                             SgExperimentStates)
+                                             SgExperimentStates,
+                                             SgExperimentHomeStates)
+
+
+class SgExperimentHomeComponent(SgComponent):
+    def __init__(self, container: SgExperimentHomeContainer):
+        super().__init__()
+        self._object_name = 'SgExperimentCreateComponent'
+        self.container = container
+        self.container.register(self)
+
+        self.widget = QWidget()
+        self.widget.setObjectName("SgWidget")
+        layout = QVBoxLayout()
+        self.widget.setLayout(layout)
+
+        newButton = QPushButton("New experiment")
+        newButton.setObjectName('btnDefault')
+        newButton.released.connect(self.newClicked)
+        openButton = QPushButton("Open experiment")
+        openButton.setObjectName('btnDefault')
+        openButton.released.connect(self.openClicked)
+
+        layout.addWidget(QWidget(), 1)
+        layout.addWidget(newButton, 0)
+        layout.addWidget(openButton, 0)
+        layout.addWidget(QWidget(), 1)
+
+    def openClicked(self):
+        self.container.emit(SgExperimentHomeStates.OpenClicked)
+
+    def newClicked(self):
+        self.container.emit(SgExperimentHomeStates.NewClicked)
+
+    def update(self, action):
+        pass
+
+    def get_widget(self):
+        return self.widget
 
 
 class SgExperimentCreateComponent(SgComponent):
