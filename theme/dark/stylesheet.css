@@ -1087,6 +1087,10 @@ QLabel#SgExperimentDataComponentLabel{
   image: url(picture.svg);
 }
 
+QToolButton#SgExperimentToolBarHomeButton{
+  image: url(home.svg);
+}
+
 QToolButton#SgExperimentToolBarInfoButton{
   image: url(exclamation-sign.svg);
 }

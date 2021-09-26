@@ -9,7 +9,8 @@ from qtpy.QtWidgets import (QApplication, QWidget, QVBoxLayout, QFileDialog,
 from scixtracergui.framework import SgAction, SgComponent
 
 from scixtracergui.experiment.states import (SgExperimentHomeStates,
-                                             SgExperimentCreateStates)
+                                             SgExperimentCreateStates,
+                                             SgExperimentStates)
 from scixtracergui.experiment.containers import (SgExperimentHomeContainer,
                                                  SgExperimentCreateContainer)
 from scixtracergui.experiment.components import (SgExperimentHomeComponent,
@@ -38,6 +39,7 @@ class SgExperimentApp(SgComponent):
         # connections
         self.expHomeContainer.register(self)
         self.expCreateContainer.register(self)
+        self.experimentComponent.expContainer.register(self)
 
         # create the widget
         self.widget = QWidget()
@@ -73,10 +75,18 @@ class SgExperimentApp(SgComponent):
         if action.state == SgExperimentCreateStates.ExperimentCreated:
             self.createComponent.get_widget().setVisible(False)
             self.experimentComponent.get_widget().setVisible(True)
+        if action.state == SgExperimentCreateStates.CancelCreateClicked:
+            self.homeComponent.get_widget().setVisible(True)
+            self.createComponent.get_widget().setVisible(False)
+            self.experimentComponent.get_widget().setVisible(False)
         if action.state == SgExperimentCreateStates.ExperimentCreationError:
             msgBox = QMessageBox()
             msgBox.setText(self.expCreateContainer.errorMessage)
             msgBox.exec()
+        if action.state == SgExperimentStates.HomeClicked:
+            self.homeComponent.get_widget().setVisible(True)
+            self.createComponent.get_widget().setVisible(False)
+            self.experimentComponent.get_widget().setVisible(False)
 
     def get_widget(self):
         return self.widget

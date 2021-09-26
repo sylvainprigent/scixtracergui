@@ -40,6 +40,7 @@ class SgExperimentComponent(SgComponent):
 
         # connections
         self.expContainer.register(self)
+        self.infoContainer.register(self)
 
         # create the widget
         self.widget = QWidget()
@@ -50,9 +51,16 @@ class SgExperimentComponent(SgComponent):
         layout.setSpacing(0)
         self.widget.setLayout(layout)
 
-        self.tabWidget = QTabWidget()
         layout.addWidget(self.toolbarComponent.get_widget())
         layout.addWidget(self.tableComponent.get_widget())
+        layout.addWidget(self.infoComponent.get_widget())
+        layout.addWidget(self.importComponent.get_widget())
+        layout.addWidget(self.tagComponent.get_widget())
+
+        # widget parenting
+        self.infoComponent.get_widget().setVisible(False)
+        self.importComponent.get_widget().setVisible(False)
+        self.tagComponent.get_widget().setVisible(False)
 
     def update(self, action: SgAction):
         if action.state == SgExperimentStates.DataDoubleClicked:
@@ -66,8 +74,12 @@ class SgExperimentComponent(SgComponent):
                   self.expContainer.selected_data_info.md_uri)
         if action.state == SgExperimentStates.EditInfoClicked:
             self.infoComponent.get_widget().setVisible(True)
+            self.toolbarComponent.get_widget().setVisible(False)
+            self.tableComponent.get_widget().setVisible(False)
         if action.state == SgExperimentStates.TagClicked:
             self.tagComponent.get_widget().setVisible(True)
+            self.toolbarComponent.get_widget().setVisible(False)
+            self.tableComponent.get_widget().setVisible(False)
         if action.state == SgExperimentStates.ExperimentLoaded:
             self.infoContainer.md_uri = self.expContainer.experiment_uri
             self.infoContainer.experiment = self.expContainer.experiment
@@ -75,6 +87,8 @@ class SgExperimentComponent(SgComponent):
         if action.state == SgExperimentStates.TagsSaved or \
                 action.state == SgExperimentStates.DataTagged:
             self.tagComponent.get_widget().setVisible(False)
+            self.toolbarComponent.get_widget().setVisible(True)
+            self.tableComponent.get_widget().setVisible(True)
             msgBox = QMessageBox()
             msgBox.setText("Tags saved")
             msgBox.exec()
@@ -82,6 +96,8 @@ class SgExperimentComponent(SgComponent):
             return
         if action.state == SgExperimentStates.ImportClicked:
             self.importComponent.get_widget().setVisible(True)
+            self.toolbarComponent.get_widget().setVisible(False)
+            self.tableComponent.get_widget().setVisible(False)
             return
         if action.state == SgExperimentStates.DataImported:
             self.importComponent.get_widget().setVisible(False)
@@ -89,7 +105,21 @@ class SgExperimentComponent(SgComponent):
             msgBox.setText("Data imported")
             msgBox.exec()
             self.tableComponent.datasetClicked('data')
+            self.toolbarComponent.get_widget().setVisible(True)
+            self.tableComponent.get_widget().setVisible(True)
             return
+        if action.state == SgMetadataExperimentStates.Saved:
+            self.infoComponent.get_widget().setVisible(False)
+            self.toolbarComponent.get_widget().setVisible(True)
+            self.tableComponent.get_widget().setVisible(True)
+        if action.state == SgExperimentStates.CancelImport:
+            self.importComponent.get_widget().setVisible(False)
+            self.toolbarComponent.get_widget().setVisible(True)
+            self.tableComponent.get_widget().setVisible(True)
+        if action.state == SgExperimentStates.CancelTag:
+            self.tagComponent.get_widget().setVisible(False)
+            self.toolbarComponent.get_widget().setVisible(True)
+            self.tableComponent.get_widget().setVisible(True)
 
     def get_widget(self):
         return self.widget

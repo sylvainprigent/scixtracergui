@@ -22,6 +22,9 @@ class SgExperimentStates(SgStates):
     DataImported = "SgExperimentStates.DataImported"
     TagsSaved = "SgExperimentStates.TagsSaved"
     DataTagged = "SgExperimentStates.DataTagged"
+    CancelImport = "SgExperimentStates.CancelImport"
+    CancelTag = "SgExperimentStates.CancelTag"
+    HomeClicked = "SgExperimentStates.HomeClicked"
 
 
 class SgExperimentCreateStates(SgStates):
@@ -29,6 +32,7 @@ class SgExperimentCreateStates(SgStates):
     CancelClicked = "SgExperimentCreateStates.CancelClicked"
     ExperimentCreated = "SgExperimentCreateStates.ExperimentCreated"
     ExperimentCreationError = "SgExperimentCreateStates.ExperimentCreationError"
+    CancelCreateClicked = "SgExperimentCreateStates.CancelCreateClicked"
 
 
 class SgExperimentHomeStates(SgStates):

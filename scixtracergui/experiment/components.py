@@ -91,6 +91,10 @@ class SgExperimentCreateComponent(SgComponent):
         createButton.setObjectName("btnPrimary")
         createButton.released.connect(self.createButtonClicked)
 
+        cancelButton = QPushButton(self.widget.tr("Cancel"))
+        cancelButton.setObjectName("btnDefault")
+        cancelButton.released.connect(self.cancelButtonClicked)
+
         layout.addWidget(title, 0, 0, 1, 3)
         layout.addWidget(destinationLabel, 1, 0)
         layout.addWidget(self.destinationEdit, 1, 1)
@@ -99,6 +103,7 @@ class SgExperimentCreateComponent(SgComponent):
         layout.addWidget(self.nameEdit, 2, 1, 1, 2)
         layout.addWidget(authorLabel, 3, 0)
         layout.addWidget(self.authorEdit, 3, 1, 1, 2)
+        layout.addWidget(cancelButton, 4, 1, 1, 1, qtpy.QtCore.Qt.AlignRight)
         layout.addWidget(createButton, 4, 2, 1, 1, qtpy.QtCore.Qt.AlignRight)
         layout.addWidget(QWidget(), 5, 0, 1, 1, qtpy.QtCore.Qt.AlignTop)
 
@@ -114,6 +119,9 @@ class SgExperimentCreateComponent(SgComponent):
         self.container.experiment_name = self.nameEdit.text()
         self.container.experiment_author = self.authorEdit.text()
         self.container.emit(SgExperimentCreateStates.CreateClicked)
+
+    def cancelButtonClicked(self):
+        self.container.emit(SgExperimentCreateStates.CancelCreateClicked)
 
     def reset(self):
         self.destinationEdit.setText('')
@@ -144,6 +152,13 @@ class SgExperimentToolbarComponent(SgComponent):
         layout = QHBoxLayout()
         layout.setSpacing(1)
         self.widget.setLayout(layout)
+
+        # home
+        homeButton = QToolButton()
+        homeButton.setObjectName("SgExperimentToolBarHomeButton")
+        homeButton.setToolTip(self.widget.tr("Home"))
+        homeButton.released.connect(self.homeButtonClicked)
+        layout.addWidget(homeButton, 0, qtpy.QtCore.Qt.AlignLeft)
 
         # info
         infoButton = QToolButton()
@@ -179,6 +194,9 @@ class SgExperimentToolbarComponent(SgComponent):
         layout.addWidget(refreshButton, 0, qtpy.QtCore.Qt.AlignLeft)
 
         layout.addWidget(QWidget(), 1, qtpy.QtCore.Qt.AlignLeft)
+
+    def homeButtonClicked(self):
+        self.container.emit(SgExperimentStates.HomeClicked)
 
     def infoButtonClicked(self):
         self.container.emit(SgExperimentStates.EditInfoClicked)
@@ -469,9 +487,13 @@ class SgExperimentImportSingleDataComponent(SgComponent):
         createddateLabel.setObjectName("SgWidget")
         self.createddateEdit = QLineEdit()
 
-        importButton = QPushButton(self.widget.tr("import"))
+        importButton = QPushButton(self.widget.tr("Import"))
         importButton.setObjectName("btnPrimary")
         importButton.released.connect(self.importButtonClicked)
+
+        cancelButton = QPushButton(self.widget.tr("Cancel"))
+        cancelButton.setObjectName("btnDefault")
+        cancelButton.released.connect(self.cancelButtonClicked)
 
         layout.addWidget(title, 0, 0, 1, 3)
         layout.addWidget(dataLabel, 1, 0)
@@ -487,10 +509,15 @@ class SgExperimentImportSingleDataComponent(SgComponent):
         layout.addWidget(self.authorEdit, 5, 1, 1, 2)
         layout.addWidget(createddateLabel, 6, 0)
         layout.addWidget(self.createddateEdit, 6, 1, 1, 2)
+        layout.addWidget(cancelButton, 7, 1, qtpy.QtCore.Qt.AlignRight)
         layout.addWidget(importButton, 7, 2, qtpy.QtCore.Qt.AlignRight)
+        layout.addWidget(QWidget(), 8, 0)
 
     def update(self, action: SgAction):
         pass
+
+    def cancelButtonClicked(self):
+        self.container.emit(SgExperimentStates.CancelImport)
 
     def importButtonClicked(self):
         self.container.import_info.file_data_path = self.dataPath.text()
@@ -571,6 +598,10 @@ class SgExperimentImportDirectoryDataComponent(SgComponent):
         importButton.setObjectName("btnPrimary")
         importButton.released.connect(self.importButtonClicked)
 
+        cancelButton = QPushButton(self.widget.tr("Cancel"))
+        cancelButton.setObjectName("btnDefault")
+        cancelButton.released.connect(self.cancelButtonClicked)
+
         layout.addWidget(title, 0, 0, 1, 4)
         layout.addWidget(dataLabel, 1, 0)
         layout.addWidget(self.dataPath, 1, 1, 1, 2)
@@ -588,7 +619,9 @@ class SgExperimentImportDirectoryDataComponent(SgComponent):
         layout.addWidget(self.authorEdit, 6, 1, 1, 2)
         layout.addWidget(createddateLabel, 7, 0)
         layout.addWidget(self.createddateEdit, 7, 1, 1, 2)
+        layout.addWidget(cancelButton, 8, 2, qtpy.QtCore.Qt.AlignRight)
         layout.addWidget(importButton, 8, 3, qtpy.QtCore.Qt.AlignRight)
+        layout.addWidget(QWidget(), 9, 0)
 
         self.progressBar = QProgressBar()
         self.progressBar.setVisible(False)
@@ -601,6 +634,9 @@ class SgExperimentImportDirectoryDataComponent(SgComponent):
                 self.progressBar.setValue(self.container.progress)
                 if self.container.progress == 100:
                     self.progressBar.setVisible(False)
+
+    def cancelButtonClicked(self):
+        self.container.emit(SgExperimentStates.CancelImport)
 
     def importButtonClicked(self):
         self.container.import_info.dir_data_path = self.dataPath.text()
@@ -713,10 +749,10 @@ class SgExperimentTagsListComponent(SgComponent):
         buttonsLayout.addWidget(cancelButton, 1, qtpy.QtCore.Qt.AlignRight)
         buttonsLayout.addWidget(saveButton, 0, qtpy.QtCore.Qt.AlignRight)
 
-        layout.addWidget(title)
-        layout.addWidget(addWidget)
-        layout.addWidget(scrollArea)
-        layout.addWidget(buttonsWidget)
+        layout.addWidget(title, 0, qtpy.QtCore.Qt.AlignTop)
+        layout.addWidget(addWidget, 0, qtpy.QtCore.Qt.AlignTop)
+        layout.addWidget(scrollArea, 1)
+        layout.addWidget(buttonsWidget, 0, qtpy.QtCore.Qt.AlignBottom)
 
         addButton.released.connect(self.addButtonClicked)
         cancelButton.released.connect(self.cancelButtonClicked)
@@ -751,6 +787,7 @@ class SgExperimentTagsListComponent(SgComponent):
 
     def cancelButtonClicked(self):
         self.reload()
+        self.container.emit(SgExperimentStates.CancelTag)
 
     def saveButtonClicked(self):
         tags = []
@@ -836,6 +873,7 @@ class SgExperimentTagsUsingSeparatorsComponent(SgComponent):
         layout.addWidget(gridWidget, 1, 0, 1, 3)
         layout.addWidget(addLineButton, 2, 0)
         layout.addWidget(validateButton, 3, 2)
+        layout.addWidget(QWidget())
 
     def validated(self):
         tags = []
@@ -923,6 +961,7 @@ class SgExperimentTagsUsingNameComponent(SgComponent):
         layout.addWidget(searchWidget, 2, 1)
         layout.addWidget(addLineButton, 3, 1)
         layout.addWidget(validateButton, 4, 2)
+        layout.addWidget(QWidget())
 
     def validated(self):
         names = []
