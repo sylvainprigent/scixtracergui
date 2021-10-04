@@ -265,7 +265,7 @@ class SgMetadataExperimentComponent(SgComponent):
         self.widget.setAttribute(qtpy.QtCore.Qt.WA_StyledBackground, True)
 
         layout = QGridLayout()
-        self.widget.setLayout(layout)
+        layout.setContentsMargins(0, 0, 0, 0)
 
         title = QLabel(self.widget.tr("Experiment information"))
         title.setObjectName("SgLabelFormHeader1")
@@ -274,18 +274,34 @@ class SgMetadataExperimentComponent(SgComponent):
         nameLabel = QLabel('Name')
         nameLabel.setObjectName('SgLabel')
         self.nameEdit = QLineEdit()
+        self.nameEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         authorLabel = QLabel('Author')
         authorLabel.setObjectName('SgLabel')
         self.authorEdit = QLineEdit()
+        self.authorEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         createddateLabel = QLabel('Created date')
         createddateLabel.setObjectName('SgLabel')
         self.createddateEdit = QLineEdit()
+        self.createddateEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect,
+                                          False)
 
         saveButton = QPushButton(self.widget.tr("Save"))
         saveButton.setObjectName("btnPrimary")
         saveButton.released.connect(self.saveButtonClicked)
+
+        cancelButton = QPushButton(self.widget.tr("Cancel"))
+        cancelButton.setObjectName("btnDefault")
+        cancelButton.released.connect(self.cancelButtonClicked)
+
+        btnWidget = QWidget()
+        btnLayout = QHBoxLayout()
+        btnLayout.setContentsMargins(0, 0, 0, 0)
+        btnLayout.setSpacing(2)
+        btnLayout.addWidget(cancelButton)
+        btnLayout.addWidget(saveButton)
+        btnWidget.setLayout(btnLayout)
 
         layout.addWidget(title, 0, 0, 1, 2)
         layout.addWidget(nameLabel, 1, 0)
@@ -294,8 +310,21 @@ class SgMetadataExperimentComponent(SgComponent):
         layout.addWidget(self.authorEdit, 2, 1)
         layout.addWidget(createddateLabel, 3, 0)
         layout.addWidget(self.createddateEdit, 3, 1)
-        layout.addWidget(saveButton, 4, 0, 1, 2)
-        layout.addWidget(QWidget(), 5, 0, 1, 2, qtpy.QtCore.Qt.AlignTop)
+        layout.addWidget(btnWidget, 4, 1, 1, 1, qtpy.QtCore.Qt.AlignRight)
+
+        w = QWidget()
+        w.setLayout(layout)
+
+        totallayout = QVBoxLayout()
+        totallayout.addWidget(w, 0)
+        totallayout.addWidget(QWidget(), 1)
+        self.widget.setLayout(totallayout)
+
+    def cancelButtonClicked(self):
+        self.nameEdit.setText(self.container.experiment.name)
+        self.authorEdit.setText(self.container.experiment.author)
+        self.createddateEdit.setText(self.container.experiment.date)
+        self.container.emit(SgMetadataExperimentStates.CancelClicked)
 
     def saveButtonClicked(self):
         self.container.experiment.name = self.nameEdit.text()

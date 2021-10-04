@@ -3,11 +3,12 @@ from qtpy.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
                             QToolButton, QPushButton, QLabel, QLineEdit,
                             QCheckBox, QComboBox, QFileDialog, QProgressBar,
                             QTableWidget, QTableWidgetItem, QSpinBox,
-                            QScrollArea, QTabWidget, QAbstractItemView)
+                            QScrollArea, QTabWidget, QAbstractItemView,
+                            QHeaderView)
 
 import scixtracer as sx
 from scixtracergui.framework import SgComponent, SgAction
-from scixtracergui.widgets import SgTagWidget
+from scixtracergui.widgets import SgTagWidget, SgButton
 from scixtracergui.experiment.containers import (SgExperimentCreateContainer,
                                                  SgExperimentContainer,
                                                  SgExperimentHomeContainer)
@@ -252,13 +253,17 @@ class SgExperimentTableComponent(SgComponent):
         self.tableWidget = QTableWidget()
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tableWidget.setColumnCount(4)
+        self.tableWidget.setAlternatingRowColors(True)
 
         labels = ["", "Name", "Author", "Date"]
         self.tableWidget.setHorizontalHeaderLabels(labels)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
 
-        self.tableWidget.cellClicked.connect(self.cellClicked)
-        self.tableWidget.cellDoubleClicked.connect(self.cellDoubleClicked)
+        self.tableWidget.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.tableWidget.verticalHeader().setDefaultSectionSize(36)
+
+        #self.tableWidget.cellClicked.connect(self.cellClicked)
+        #self.tableWidget.cellDoubleClicked.connect(self.cellDoubleClicked)
 
         layout.addWidget(self.tableWidget)
 
@@ -276,8 +281,8 @@ class SgExperimentTableComponent(SgComponent):
     def drawRawDataset(self):
         # headers
         tags = self.container.experiment.tag_keys
-        self.tableWidget.setColumnCount(4 + len(tags))
-        labels = ["Name"]
+        self.tableWidget.setColumnCount(6 + len(tags))
+        labels = ["", "", "Name"]
         for tag in tags:
             labels.append(tag)
         labels.append("Format")
@@ -288,20 +293,31 @@ class SgExperimentTableComponent(SgComponent):
         exp_size = self.container.dataset.size()
         self.tableWidget.setRowCount(0)
         self.tableWidget.setRowCount(exp_size)
-        if exp_size < 10:
-            self.tableWidget.verticalHeader().setFixedWidth(20)
-        elif 10 <= exp_size < 100:
-            self.tableWidget.verticalHeader().setFixedWidth(40)
-        elif 100 <= exp_size < 1000:
-            self.tableWidget.verticalHeader().setFixedWidth(60)
+        self.tableWidget.verticalHeader().setVisible(False)
 
         data_list = self.container.dataset.uris
 
         for i in range(len(data_list)):
             raw_metadata = self.req.get_rawdata(data_list[i].md_uri)
 
-            # name
+            # view button
             col_idx = 0
+            view_btn = SgButton("View")
+            view_btn.id = i
+            view_btn.setObjectName("btnTablePrimary")
+            view_btn.clickedId.connect(self.viewDataClicked)
+            self.tableWidget.setCellWidget(i, col_idx, view_btn)
+
+            # metadata button
+            col_idx += 1
+            edit_btn = SgButton("Metadata")
+            edit_btn.id = i
+            edit_btn.setObjectName("btnTableDefault")
+            edit_btn.clickedId.connect(self.viewMetaDataClicked)
+            self.tableWidget.setCellWidget(i, col_idx, edit_btn)
+
+            # name
+            col_idx += 1
             self.tableWidget.setItem(i, col_idx, QTableWidgetItem(
                 raw_metadata.name))
             # tags
@@ -326,8 +342,8 @@ class SgExperimentTableComponent(SgComponent):
     def drawProcessedDataSet(self):
         # headers
         tags = self.container.experiment.tag_keys
-        self.tableWidget.setColumnCount(6 + len(tags))
-        labels = ["Name", "Parent", "Label"]
+        self.tableWidget.setColumnCount(8 + len(tags))
+        labels = ["", "", "Name", "Parent", "Label"]
         for tag in tags:
             labels.append(tag)
         labels.append("Format")
@@ -338,12 +354,7 @@ class SgExperimentTableComponent(SgComponent):
         exp_size = self.container.dataset.size()
         self.tableWidget.setRowCount(0)
         self.tableWidget.setRowCount(exp_size)
-        if exp_size < 10:
-            self.tableWidget.verticalHeader().setFixedWidth(20)
-        elif 10 <= exp_size < 100:
-            self.tableWidget.verticalHeader().setFixedWidth(40)
-        elif 100 <= exp_size < 1000:
-            self.tableWidget.verticalHeader().setFixedWidth(60)
+        self.tableWidget.verticalHeader().setVisible(False)
 
         data_list = self.container.dataset.uris
 
@@ -351,8 +362,25 @@ class SgExperimentTableComponent(SgComponent):
             raw_metadata = self.req.get_processeddata(data_list[i].md_uri)
             parent_metadata = self.req.get_parent(raw_metadata)
             origin_metadata = self.req.get_origin(raw_metadata)
-            # name
+
+            # view button
             col_idx = 0
+            view_btn = SgButton("View")
+            view_btn.id = i
+            view_btn.setObjectName("btnTablePrimary")
+            view_btn.clickedId.connect(self.viewDataClicked)
+            self.tableWidget.setCellWidget(i, col_idx, view_btn)
+
+            # metadata button
+            col_idx += 1
+            edit_btn = SgButton("Metadata")
+            edit_btn.id = i
+            edit_btn.setObjectName("btnTableDefault")
+            edit_btn.clickedId.connect(self.viewMetaDataClicked)
+            self.tableWidget.setCellWidget(i, col_idx, edit_btn)
+
+            # name
+            col_idx += 1
             self.tableWidget.setItem(i, col_idx,
                                      QTableWidgetItem(raw_metadata.name))
             # origin
@@ -392,17 +420,17 @@ class SgExperimentTableComponent(SgComponent):
         self.container.dataset_name = name
         self.container.emit(SgExperimentStates.DatasetChanged)
 
-    def cellClicked(self, row: int, col: int):
+    def viewDataClicked(self, row: int):
         self.container.selected_data_info = self.container.dataset.uris[row]
-        self.highlightLine(row)
-        if self.container.dataset_name == 'data':
-            self.container.emit(SgExperimentStates.RawDataClicked)
-        else:
-            self.container.emit(SgExperimentStates.ProcessedDataClicked)
+        self.container.emit(SgExperimentStates.ViewDataClicked)
 
-    def cellDoubleClicked(self, row: int, col: int):
+    def viewMetaDataClicked(self, row: int):
         self.container.selected_data_info = self.container.dataset.uris[row]
-        self.container.emit(SgExperimentStates.DataDoubleClicked)
+        #self.highlightLine(row)
+        if self.container.dataset_name == 'data':
+            self.container.emit(SgExperimentStates.ViewRawMetaDataClicked)
+        else:
+            self.container.emit(SgExperimentStates.ViewProcessedMetaDataClicked)
 
     def highlightLine(self, row: int):
         for col in range(self.tableWidget.columnCount()):

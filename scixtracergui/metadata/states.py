@@ -23,3 +23,4 @@ class SgMetadataExperimentStates(SgStates):
     Loaded = "SgMetadataExperimentStates.Loaded"
     SaveClicked = "SgMetadataExperimentStates.SaveClicked"
     Saved = "SgMetadataExperimentStates.Saved"
+    CancelClicked = "SgMetadataExperimentStates.CancelClicked"

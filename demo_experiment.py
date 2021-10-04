@@ -58,6 +58,15 @@ class SgExperimentApp(SgComponent):
         self.experimentComponent.get_widget().setVisible(False)
 
     def update(self, action: SgAction):
+        if action.state == SgExperimentStates.ViewDataClicked:
+            print('You double clicked:',
+                  self.experimentComponent.expContainer.selected_data_info.md_uri)
+        if action.state == SgExperimentStates.ViewRawMetaDataClicked:
+            print('You clicked the RAW data:',
+                  self.experimentComponent.expContainer.selected_data_info.md_uri)
+        if action.state == SgExperimentStates.ViewProcessedMetaDataClicked:
+            print('You clicked the PROCESSED data:',
+                  self.experimentComponent.expContainer.selected_data_info.md_uri)
         if action.state == SgExperimentHomeStates.NewClicked:
             self.createComponent.get_widget().setVisible(True)
             self.homeComponent.get_widget().setVisible(False)
@@ -100,8 +109,17 @@ if __name__ == '__main__':
     dir_path = os.path.dirname(os.path.realpath(__file__))
     component = SgExperimentApp()
 
-    rec = QApplication.desktop().screenGeometry()
-    component.get_widget().resize(int(rec.width() / 2), int(rec.height() / 2))
+    rec = app.primaryScreen().size()
+    component.get_widget().resize(int(3*rec.width() / 4), int(3*rec.height() / 4))
+
+    component.get_widget().setGeometry(
+        qtpy.QtWidgets.QStyle.alignedRect(
+            qtpy.QtCore.Qt.LeftToRight,
+            qtpy.QtCore.Qt.AlignCenter,
+            component.get_widget().size(),
+            qtpy.QtGui.QGuiApplication.primaryScreen().availableGeometry(),
+        ),
+    )
     component.get_widget().show()
 
     # Run the main Qt loop

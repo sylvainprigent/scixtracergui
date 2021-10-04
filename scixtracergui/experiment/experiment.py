@@ -63,15 +63,15 @@ class SgExperimentComponent(SgComponent):
         self.tagComponent.get_widget().setVisible(False)
 
     def update(self, action: SgAction):
-        if action.state == SgExperimentStates.DataDoubleClicked:
-            print('You double clicked:',
-                  self.expContainer.selected_data_info.md_uri)
-        if action.state == SgExperimentStates.RawDataClicked:
-            print('You clicked the RAW data:',
-                  self.expContainer.selected_data_info.md_uri)
-        if action.state == SgExperimentStates.ProcessedDataClicked:
-            print('You clicked the PROCESSED data:',
-                  self.expContainer.selected_data_info.md_uri)
+        #if action.state == SgExperimentStates.DataDoubleClicked:
+        #    print('You double clicked:',
+        #          self.expContainer.selected_data_info.md_uri)
+        #if action.state == SgExperimentStates.RawDataClicked:
+        #    print('You clicked the RAW data:',
+        #          self.expContainer.selected_data_info.md_uri)
+        #if action.state == SgExperimentStates.ProcessedDataClicked:
+        #    print('You clicked the PROCESSED data:',
+        #          self.expContainer.selected_data_info.md_uri)
         if action.state == SgExperimentStates.EditInfoClicked:
             self.infoComponent.get_widget().setVisible(True)
             self.toolbarComponent.get_widget().setVisible(False)
@@ -108,7 +108,8 @@ class SgExperimentComponent(SgComponent):
             self.toolbarComponent.get_widget().setVisible(True)
             self.tableComponent.get_widget().setVisible(True)
             return
-        if action.state == SgMetadataExperimentStates.Saved:
+        if action.state == SgMetadataExperimentStates.Saved or \
+                action.state == SgMetadataExperimentStates.CancelClicked:
             self.infoComponent.get_widget().setVisible(False)
             self.toolbarComponent.get_widget().setVisible(True)
             self.tableComponent.get_widget().setVisible(True)

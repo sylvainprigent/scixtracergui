@@ -10,9 +10,6 @@ class SgExperimentStates(SgStates):
     TagClicked = "SgExperimentStates.TagClicked"
     RefreshClicked = "SgExperimentStates.RefreshClicked"
     DataSetLoaded = "SgExperimentStates.DataSetLoaded"
-    DataDoubleClicked = "SgExperimentStates.DataDoubleClicked"
-    RawDataClicked = "SgExperimentStates.RawDataClicked"
-    ProcessedDataClicked = "SgExperimentStates.ProcessedDataClicked"
     NewImportFile = "SgExperimentStates.NewImportFile"
     NewImportDir = "SgExperimentStates.NewImportDir"
     Progress = "SgExperimentStates.Progress"
@@ -25,6 +22,9 @@ class SgExperimentStates(SgStates):
     CancelImport = "SgExperimentStates.CancelImport"
     CancelTag = "SgExperimentStates.CancelTag"
     HomeClicked = "SgExperimentStates.HomeClicked"
+    ViewDataClicked = "SgExperimentStates.ViewDataClicked"
+    ViewRawMetaDataClicked = "SgExperimentStates.ViewRawMetaDataClicked"
+    ViewProcessedMetaDataClicked = "SgExperimentStates.ViewProcessedMetaDataClicked"
 
 
 class SgExperimentCreateStates(SgStates):
