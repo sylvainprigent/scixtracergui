@@ -1,7 +1,8 @@
 from ._widgets import (SgButton, SgToolButton, SgFileSelectWidget, SgDragLabel,
                        SgTagWidget, SgFlowLayout, SgNavigationBar,
                        SgHideableWidget, SgClosableButton,
-                       SgStaticStackedWidget, SgSlidingStackedWidget)
+                       SgStaticStackedWidget, SgSlidingStackedWidget,
+                       SgKeyValueView)
 
 __all__ = ['SgButton',
            'SgToolButton',
@@ -13,5 +14,6 @@ __all__ = ['SgButton',
            'SgHideableWidget',
            'SgClosableButton',
            'SgStaticStackedWidget',
-           'SgSlidingStackedWidget'
+           'SgSlidingStackedWidget',
+           'SgKeyValueView'
            ]

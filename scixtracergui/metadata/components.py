@@ -5,6 +5,7 @@ from qtpy.QtWidgets import (QWidget, QLabel, QVBoxLayout, QScrollArea,
                             QToolButton, QSplitter, QLineEdit, QPushButton,
                             QTextEdit, QMessageBox, QFileDialog)
 
+from scixtracergui.widgets import SgKeyValueView
 from scixtracergui.framework import SgComponent, SgAction
 from scixtracergui.metadata.states import (SgRawDataStates,
                                            SgProcessedDataStates,
@@ -149,33 +150,13 @@ class SgProcessedDataComponent(SgComponent):
         widget.setLayout(layout)
         self.widget.setWidget(widget)
 
-        uriLabel = QLabel('URI')
-        self.uriEdit = QLineEdit()
-        self.uriEdit.setEnabled(False)
-
-        nameLabel = QLabel('Name')
-        self.nameEdit = QLineEdit()
-        self.nameEdit.setEnabled(False)
-
-        authorLabel = QLabel('Author')
-        self.authorEdit = QLineEdit()
-        self.authorEdit.setEnabled(False)
-
-        dateLabel = QLabel('Date')
-        self.dateEdit = QLineEdit()
-        self.dateEdit.setEnabled(False)
-
-        formatLabel = QLabel('Format')
-        self.formatEdit = QLineEdit()
-        self.formatEdit.setEnabled(False)
-
-        outlabelLabel = QLabel('Label')
-        self.outlabelEdit = QLineEdit()
-        self.outlabelEdit.setEnabled(False)
-
-        originLabel = QLabel('Parent')
-        self.originEdit = QLineEdit()
-        self.originEdit.setEnabled(False)
+        self.uriView = SgKeyValueView('URI', '')
+        self.nameView = SgKeyValueView('Name', '')
+        self.authorView = SgKeyValueView('Author', '')
+        self.dateView = SgKeyValueView('Date', '')
+        self.formatView = SgKeyValueView('Format', '')
+        self.labelView = SgKeyValueView('Output label', '')
+        self.parentView = SgKeyValueView('Parent', '')
 
         descLabel = QLabel('Description')
         descLabel.setObjectName('SgMetadataTitle')
@@ -190,24 +171,20 @@ class SgProcessedDataComponent(SgComponent):
         tagsWidget.setLayout(self.tagsLayout)
 
         layout.addWidget(descLabel, 0, 0, 1, 2, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(uriLabel, 1, 0, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(self.uriEdit, 1, 1, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(nameLabel, 2, 0, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(self.nameEdit, 2, 1, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(formatLabel, 3, 0, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(self.formatEdit, 3, 1, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(dateLabel, 4, 0, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(self.dateEdit, 4, 1, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(authorLabel, 5, 0, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(self.authorEdit, 5, 1, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(tagsLabel, 6, 0, 1, 2, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(outlabelLabel, 7, 0, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(self.outlabelEdit, 7, 1, qtpy.QtCore.Qt.AlignTop)
+
+        layout.addWidget(self.uriView, 1, 0)
+        layout.addWidget(self.nameView, 2, 0)
+        layout.addWidget(self.authorView, 3, 0)
+        layout.addWidget(self.dateView, 4, 0)
+        layout.addWidget(self.formatView, 5, 0)
+        layout.addWidget(self.labelView, 6, 0)
+
+        layout.addWidget(tagsLabel, 7, 0, 1, 2)
         layout.addWidget(tagsWidget, 8, 0, 1, 2, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(originTitleLabel, 9, 0, 1, 2,
-                         qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(originLabel, 10, 0, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(self.originEdit, 10, 1, qtpy.QtCore.Qt.AlignTop)
+
+        layout.addWidget(originTitleLabel, 9, 0, 1, 2, qtpy.QtCore.Qt.AlignTop)
+        layout.addWidget(self.parentView, 10, 0)
+
         layout.addWidget(QWidget(), 11, 0, 1, 2, qtpy.QtCore.Qt.AlignTop)
         layout.setAlignment(qtpy.QtCore.Qt.AlignTop)
 
@@ -218,12 +195,19 @@ class SgProcessedDataComponent(SgComponent):
         if action.state == SgProcessedDataStates.Loaded:
             metadata = self.container.processeddata
 
-            self.uriEdit.setText(metadata.uri)
-            self.nameEdit.setText(metadata.name)
-            self.authorEdit.setText(metadata.author)
-            self.dateEdit.setText(metadata.date)
-            self.formatEdit.setText(metadata.format)
-            self.outlabelEdit.setText(metadata.output['label'])
+            #self.uriEdit.setText(metadata.uri)
+            #self.nameEdit.setText(metadata.name)
+            #self.authorEdit.setText(metadata.author)
+            #self.dateEdit.setText(metadata.date)
+            #self.formatEdit.setText(metadata.format)
+            #self.outlabelEdit.setText(metadata.output['label'])
+
+            self.uriView.setValue(metadata.uri)
+            self.nameView.setValue(metadata.name)
+            self.authorView.setValue(metadata.author)
+            self.dateView.setValue(metadata.date)
+            self.formatView.setValue(metadata.format)
+            self.labelView.setValue(metadata.output['label'])
 
             # tags
             orig = self.container.processed_origin
@@ -244,9 +228,11 @@ class SgProcessedDataComponent(SgComponent):
 
             parent = self.container.processed_parent
             if parent:
-                self.originEdit.setText(parent.name)
+                self.parentView.setValue(parent.name)
+                #self.originEdit.setText(parent.name)
             else:
-                self.originEdit.setText("")    
+                self.parentView.setValue("")
+                #self.originEdit.setText("")
 
     def get_widget(self): 
         return self.widget  

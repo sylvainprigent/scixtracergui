@@ -52,8 +52,8 @@ if __name__ == '__main__':
     component.get_widget().show()
 
     # Run the main Qt loop
-    stylesheet_path = os.path.join(dir_path, 'theme', 'dark', 'stylesheet.css')
+    stylesheet_path = os.path.join(dir_path, 'theme', 'napari', 'stylesheet.css')
     app.setStyleSheet("file:///" + stylesheet_path)
-    icon_path = os.path.join(dir_path, "theme", "dark", "icon.png")
+    icon_path = os.path.join(dir_path, "theme", "napari", "icon.png")
     app.setWindowIcon(QIcon(icon_path))
     sys.exit(app.exec_())

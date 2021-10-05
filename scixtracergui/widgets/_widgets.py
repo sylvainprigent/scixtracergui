@@ -58,7 +58,7 @@ class SgFileSelectWidget(QWidget):
         layout.addWidget(self.lineEdit)
 
         browseButton = QPushButton("...")
-        browseButton.setObjectName("BiBrowseButton")
+        browseButton.setObjectName("SgBrowseButton")
         layout.addWidget(browseButton, 0, qtpy.QtCore.Qt.AlignRight)
         browseButton.released.connect(self.browseClicked)
 
@@ -103,6 +103,33 @@ class SgDragLabel(QLabel):
                 drag.setPixmap(self.pixmap())
 
             drag.exec_()
+
+
+class SgKeyValueView(QWidget):
+    def __init__(self, key, value, parent: QWidget = None):
+        super().__init__(parent)
+
+        self.setAttribute(qtpy.QtCore.Qt.WA_StyledBackground, True)
+        layout = QHBoxLayout()
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        self.keyLabel = QLabel(key)
+        self.keyLabel.setAttribute(qtpy.QtCore.Qt.WA_StyledBackground, True)
+        self.keyLabel.setObjectName("SgKeyValueViewKey")
+        self.valueLabel = QLabel(value)
+        self.valueLabel.setObjectName("SgKeyValueViewValue")
+
+        layout.addWidget(self.keyLabel)
+        layout.addWidget(self.valueLabel)
+        self.setLayout(layout)
+
+    def setKey(self, key):
+        self.keyLabel.setText(key)
+
+    def setValue(self, value):
+        self.valueLabel.setText(value)
+
 
 
 class SgTagWidget(QWidget):
