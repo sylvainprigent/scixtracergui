@@ -12,7 +12,8 @@ from scixtracergui.metadata.states import (SgRawDataStates,
                                            SgRunStates)
 from scixtracergui.metadata.containers import (SgRawDataContainer,
                                                SgProcessedDataContainer,
-                                               SgMetadataExperimentContainer)
+                                               SgMetadataExperimentContainer,
+                                               SgRunContainer)
 
 
 class SgRawDataComponent(SgComponent):
@@ -29,7 +30,7 @@ class SgRawDataComponent(SgComponent):
 
         widget = QWidget()
         widget.setAttribute(qtpy.QtCore.Qt.WA_StyledBackground, True)
-        widget.setObjectName("SgSideBar")
+        widget.setObjectName("SgWidget")
         layout = QGridLayout()
         widget.setLayout(layout)
         self.tagWidgets = {}
@@ -38,18 +39,23 @@ class SgRawDataComponent(SgComponent):
         uriLabel = QLabel('URI')
         self.uriEdit = QLineEdit()
         self.uriEdit.setEnabled(False)
+        self.uriEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         nameLabel = QLabel('Name')
         self.nameEdit = QLineEdit()
+        self.nameEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         formatLabel = QLabel('Format')
         self.formatEdit = QLineEdit()
+        self.formatEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         dateLabel = QLabel('Date')
         self.dateEdit = QLineEdit()
+        self.dateEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         authorLabel = QLabel('Author')
         self.authorEdit = QLineEdit()
+        self.authorEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         tagsWidget = QWidget()
         self.tagsLayout = QGridLayout()
@@ -138,43 +144,38 @@ class SgProcessedDataComponent(SgComponent):
 
         widget = QWidget()
         widget.setAttribute(qtpy.QtCore.Qt.WA_StyledBackground, True)
-        widget.setObjectName("SgSideBar")
+        widget.setObjectName("SgWidget")
         layout = QGridLayout()
         widget.setLayout(layout)
         self.widget.setWidget(widget)
 
         uriLabel = QLabel('URI')
         self.uriEdit = QLineEdit()
-        self.uriEdit.setReadOnly(True)
+        self.uriEdit.setEnabled(False)
 
         nameLabel = QLabel('Name')
         self.nameEdit = QLineEdit()
-        self.nameEdit.setReadOnly(True)
+        self.nameEdit.setEnabled(False)
 
         authorLabel = QLabel('Author')
         self.authorEdit = QLineEdit()
-        self.authorEdit.setReadOnly(True)
+        self.authorEdit.setEnabled(False)
 
         dateLabel = QLabel('Date')
         self.dateEdit = QLineEdit()
-        self.dateEdit.setReadOnly(True)
+        self.dateEdit.setEnabled(False)
 
         formatLabel = QLabel('Format')
         self.formatEdit = QLineEdit()
-        self.formatEdit.setReadOnly(True)
+        self.formatEdit.setEnabled(False)
 
         outlabelLabel = QLabel('Label')
         self.outlabelEdit = QLineEdit()
-        self.outlabelEdit.setReadOnly(True)
+        self.outlabelEdit.setEnabled(False)
 
         originLabel = QLabel('Parent')
         self.originEdit = QLineEdit()
-        self.originEdit.setReadOnly(True)
-
-        runLabel = QLabel('Run')
-        runButton = QPushButton('Show info')
-        runButton.setObjectName('btnDefault')
-        runButton.released.connect(self.emitRun)
+        self.originEdit.setEnabled(False)
 
         descLabel = QLabel('Description')
         descLabel.setObjectName('SgMetadataTitle')
@@ -185,7 +186,7 @@ class SgProcessedDataComponent(SgComponent):
 
         tagsWidget = QWidget()
         self.tagsLayout = QGridLayout()
-        self.tagsLayout.setContentsMargins(0,0,0,0)
+        self.tagsLayout.setContentsMargins(0, 0, 0, 0)
         tagsWidget.setLayout(self.tagsLayout)
 
         layout.addWidget(descLabel, 0, 0, 1, 2, qtpy.QtCore.Qt.AlignTop)
@@ -207,9 +208,7 @@ class SgProcessedDataComponent(SgComponent):
                          qtpy.QtCore.Qt.AlignTop)
         layout.addWidget(originLabel, 10, 0, qtpy.QtCore.Qt.AlignTop)
         layout.addWidget(self.originEdit, 10, 1, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(runLabel, 11, 0, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(runButton, 11, 1, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(QWidget(), 12, 0, 1, 2, qtpy.QtCore.Qt.AlignTop)
+        layout.addWidget(QWidget(), 11, 0, 1, 2, qtpy.QtCore.Qt.AlignTop)
         layout.setAlignment(qtpy.QtCore.Qt.AlignTop)
 
     def emitRun(self):
@@ -227,7 +226,7 @@ class SgProcessedDataComponent(SgComponent):
             self.outlabelEdit.setText(metadata.output['label'])
 
             # tags
-            orig = self.container.processeddata.get_origin()
+            orig = self.container.processed_origin
             if orig:
                 origin = orig
                 for i in reversed(range(self.tagsLayout.count())): 
@@ -237,13 +236,13 @@ class SgProcessedDataComponent(SgComponent):
                 for key in origin.tags:
                     label = QLabel(key)
                     edit = QLineEdit(origin.tags[key])
-                    edit.setReadOnly(True)
+                    edit.setEnabled(False)
                     row_idx += 1
                     self.tagsLayout.addWidget(label, row_idx, 0) 
                     self.tagsLayout.addWidget(edit, row_idx, 1)
                     self.tagWidgets[key] = edit
 
-            parent = self.container.processeddata.get_parent()
+            parent = self.container.processed_parent
             if parent:
                 self.originEdit.setText(parent.name)
             else:
@@ -348,7 +347,7 @@ class SgMetadataExperimentComponent(SgComponent):
 
 
 class SgMetadataRunComponent(SgComponent):
-    def __init__(self, container: SgRawDataContainer):
+    def __init__(self, container: SgRunContainer):
         super().__init__()
         self._object_name = 'SgMetadataRunComponent'
         self.container = container
@@ -361,7 +360,7 @@ class SgMetadataRunComponent(SgComponent):
 
         widget = QWidget()
         widget.setAttribute(qtpy.QtCore.Qt.WA_StyledBackground, True)
-        widget.setObjectName("SgSideBar")
+        widget.setObjectName("SgWidget")
         layout = QGridLayout()
         widget.setLayout(layout)
         self.widget.setWidget(widget)
@@ -378,15 +377,17 @@ class SgMetadataRunComponent(SgComponent):
         parametersLabel.setObjectName('SgMetadataTitle')
 
         self.parametersTable = QTableWidget()
+        self.parametersTable.setMinimumHeight(100)
 
         inputsLabel = QLabel('Inputs')
         inputsLabel.setObjectName('SgMetadataTitle')
 
         self.inputsTable = QTableWidget()
+        self.inputsTable.setMinimumHeight(100)
 
         tagsWidget = QWidget()
         self.tagsLayout = QGridLayout()
-        self.tagsLayout.setContentsMargins(0,0,0,0)
+        self.tagsLayout.setContentsMargins(0, 0, 0, 0)
         tagsWidget.setLayout(self.tagsLayout)
 
         layout.addWidget(toolLabel, 0, 0)

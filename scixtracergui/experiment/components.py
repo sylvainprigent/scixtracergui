@@ -75,18 +75,21 @@ class SgExperimentCreateComponent(SgComponent):
         destinationLabel = QLabel(self.widget.tr("Destination"))
         destinationLabel.setObjectName("SgLabel")
         self.destinationEdit = QLineEdit()
+        self.destinationEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
         self.destinationEdit.setText(default_destination)
         browseButton = QPushButton(self.widget.tr("..."))
-        browseButton.setObjectName("SgBrowseButton")
+        browseButton.setObjectName("btnDefault")
         browseButton.released.connect(self.browseButtonClicked)
 
         nameLabel = QLabel(self.widget.tr("Experiment name"))
         nameLabel.setObjectName("SgLabel")
         self.nameEdit = QLineEdit()
+        self.nameEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         authorLabel = QLabel(self.widget.tr("Author"))
         authorLabel.setObjectName("SgLabel")
         self.authorEdit = QLineEdit()
+        self.authorEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         createButton = QPushButton(self.widget.tr("Create"))
         createButton.setObjectName("btnPrimary")
@@ -131,6 +134,32 @@ class SgExperimentCreateComponent(SgComponent):
 
     def setDestination(self, path: str):
         self.destinationEdit.setText(path)
+
+    def update(self, action: SgAction):
+        pass
+
+    def get_widget(self):
+        return self.widget
+
+
+class SgExperimentMetaToolbarComponent(SgComponent):
+    def __init__(self, container: SgExperimentContainer):
+        super().__init__()
+        self._object_name = 'SgExperimentMetaToolbarComponent'
+        self.container = container
+        self.container.register(self)
+
+        self.widget = QWidget()
+        self.widget.setObjectName('SgToolBar')
+        layout = QHBoxLayout()
+        self.widget.setLayout(layout)
+        returnButton = QToolButton()
+        returnButton.setObjectName('SgReturnToolButton')
+        returnButton.released.connect(self.emitReturn)
+        layout.addWidget(returnButton, 0, qtpy.QtCore.Qt.AlignLeft)
+
+    def emitReturn(self):
+        self.container.emit(SgExperimentStates.MainPageClicked)
 
     def update(self, action: SgAction):
         pass
@@ -449,7 +478,7 @@ class SgExperimentImportComponent(SgComponent):
         self.widget.setAttribute(qtpy.QtCore.Qt.WA_StyledBackground, True)
         self.widget.setObjectName("SgWidget")
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(5, 5, 5, 5)
         self.widget.setLayout(layout)
         tabWidget = QTabWidget()
         layout.addWidget(tabWidget)
@@ -481,7 +510,6 @@ class SgExperimentImportSingleDataComponent(SgComponent):
         self.widget.setObjectName("SgWidget")
 
         layout = QGridLayout()
-        self.widget.setLayout(layout)
 
         # title
         title = QLabel(self.widget.tr("Import single data"))
@@ -490,8 +518,9 @@ class SgExperimentImportSingleDataComponent(SgComponent):
         dataLabel = QLabel(self.widget.tr("Data"))
         dataLabel.setObjectName("SgWidget")
         self.dataPath = QLineEdit()
+        self.dataPath.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
         browseDataButton = QPushButton(self.widget.tr("..."))
-        browseDataButton.setObjectName("SgBrowseButton")
+        browseDataButton.setObjectName("btnDefault")
         browseDataButton.released.connect(self.browseDataButtonClicked)
 
         copyDataLabel = QLabel(self.widget.tr("Copy data"))
@@ -502,26 +531,26 @@ class SgExperimentImportSingleDataComponent(SgComponent):
         nameLabel = QLabel(self.widget.tr("Name"))
         nameLabel.setObjectName("SgWidget")
         self.nameEdit = QLineEdit()
+        self.nameEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         formatLabel = QLabel(self.widget.tr("Format"))
         formatLabel.setObjectName("SgWidget")
         self.formatEdit = QLineEdit()
+        self.formatEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         authorLabel = QLabel(self.widget.tr("Author"))
         authorLabel.setObjectName("SgWidget")
         self.authorEdit = QLineEdit()
+        self.authorEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         createddateLabel = QLabel(self.widget.tr("Created date"))
         createddateLabel.setObjectName("SgWidget")
         self.createddateEdit = QLineEdit()
+        self.createddateEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         importButton = QPushButton(self.widget.tr("Import"))
         importButton.setObjectName("btnPrimary")
         importButton.released.connect(self.importButtonClicked)
-
-        cancelButton = QPushButton(self.widget.tr("Cancel"))
-        cancelButton.setObjectName("btnDefault")
-        cancelButton.released.connect(self.cancelButtonClicked)
 
         layout.addWidget(title, 0, 0, 1, 3)
         layout.addWidget(dataLabel, 1, 0)
@@ -537,15 +566,17 @@ class SgExperimentImportSingleDataComponent(SgComponent):
         layout.addWidget(self.authorEdit, 5, 1, 1, 2)
         layout.addWidget(createddateLabel, 6, 0)
         layout.addWidget(self.createddateEdit, 6, 1, 1, 2)
-        layout.addWidget(cancelButton, 7, 1, qtpy.QtCore.Qt.AlignRight)
         layout.addWidget(importButton, 7, 2, qtpy.QtCore.Qt.AlignRight)
-        layout.addWidget(QWidget(), 8, 0)
+
+        totalLayout = QVBoxLayout()
+        self.widget.setLayout(totalLayout)
+        thisWidget = QWidget()
+        thisWidget.setLayout(layout)
+        totalLayout.addWidget(thisWidget, 0)
+        totalLayout.addWidget(QWidget(), 1)
 
     def update(self, action: SgAction):
         pass
-
-    def cancelButtonClicked(self):
-        self.container.emit(SgExperimentStates.CancelImport)
 
     def importButtonClicked(self):
         self.container.import_info.file_data_path = self.dataPath.text()
@@ -578,7 +609,6 @@ class SgExperimentImportDirectoryDataComponent(SgComponent):
         self.widget.setObjectName("SgWidget")
 
         layout = QGridLayout()
-        self.widget.setLayout(layout)
 
         # title
         title = QLabel(self.widget.tr("Import from folder"))
@@ -587,9 +617,11 @@ class SgExperimentImportDirectoryDataComponent(SgComponent):
         dataLabel = QLabel(self.widget.tr("Folder"))
         dataLabel.setObjectName("SgWidget")
         self.dataPath = QLineEdit()
+        self.dataPath.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
         browseDataButton = QPushButton(self.widget.tr("..."))
-        browseDataButton.setObjectName("SgBrowseButton")
+        browseDataButton.setObjectName("btnDefault")
         browseDataButton.released.connect(self.browseDataButtonClicked)
+        #browseDataButton.setMaximumWidth(100)
 
         recursiveLabel = QLabel(self.widget.tr("Recursive"))
         recursiveLabel.setObjectName("SgWidget")
@@ -603,6 +635,7 @@ class SgExperimentImportDirectoryDataComponent(SgComponent):
         self.filterComboBox.addItem(self.widget.tr('Start With'))
         self.filterComboBox.addItem(self.widget.tr('Contains'))
         self.filterEdit = QLineEdit()
+        self.filterEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
         self.filterEdit.setText('.tif')
 
         copyDataLabel = QLabel(self.widget.tr("Copy data"))
@@ -613,27 +646,26 @@ class SgExperimentImportDirectoryDataComponent(SgComponent):
         formatLabel = QLabel(self.widget.tr("Format"))
         formatLabel.setObjectName("SgWidget")
         self.formatEdit = QLineEdit()
+        self.formatEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         authorLabel = QLabel(self.widget.tr("Author"))
         authorLabel.setObjectName("SgWidget")
         self.authorEdit = QLineEdit()
+        self.authorEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         createddateLabel = QLabel(self.widget.tr("Created date"))
         createddateLabel.setObjectName("SgWidget")
         self.createddateEdit = QLineEdit()
+        self.createddateEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         importButton = QPushButton(self.widget.tr("import"))
         importButton.setObjectName("btnPrimary")
         importButton.released.connect(self.importButtonClicked)
 
-        cancelButton = QPushButton(self.widget.tr("Cancel"))
-        cancelButton.setObjectName("btnDefault")
-        cancelButton.released.connect(self.cancelButtonClicked)
-
         layout.addWidget(title, 0, 0, 1, 4)
-        layout.addWidget(dataLabel, 1, 0)
+        layout.addWidget(dataLabel, 1, 0, 1, 1)
         layout.addWidget(self.dataPath, 1, 1, 1, 2)
-        layout.addWidget(browseDataButton, 1, 3)
+        layout.addWidget(browseDataButton, 1, 3, 1, 1, qtpy.QtCore.Qt.AlignLeft)
         layout.addWidget(recursiveLabel, 2, 0)
         layout.addWidget(self.recursiveBox, 2, 1, 1, 2)
         layout.addWidget(filterLabel, 3, 0)
@@ -642,18 +674,24 @@ class SgExperimentImportDirectoryDataComponent(SgComponent):
         layout.addWidget(copyDataLabel, 4, 0)
         layout.addWidget(self.copyDataBox, 4, 1, 1, 2)
         layout.addWidget(formatLabel, 5, 0)
-        layout.addWidget(self.formatEdit, 5, 1, 1, 2)
+        layout.addWidget(self.formatEdit, 5, 1, 1, 3)
         layout.addWidget(authorLabel, 6, 0)
-        layout.addWidget(self.authorEdit, 6, 1, 1, 2)
+        layout.addWidget(self.authorEdit, 6, 1, 1, 3)
         layout.addWidget(createddateLabel, 7, 0)
-        layout.addWidget(self.createddateEdit, 7, 1, 1, 2)
-        layout.addWidget(cancelButton, 8, 2, qtpy.QtCore.Qt.AlignRight)
+        layout.addWidget(self.createddateEdit, 7, 1, 1, 3)
         layout.addWidget(importButton, 8, 3, qtpy.QtCore.Qt.AlignRight)
         layout.addWidget(QWidget(), 9, 0)
 
         self.progressBar = QProgressBar()
         self.progressBar.setVisible(False)
-        layout.addWidget(self.progressBar, 8, 1, 1, 3)
+
+        totalLayout = QVBoxLayout()
+        self.widget.setLayout(totalLayout)
+        thisWidget = QWidget()
+        thisWidget.setLayout(layout)
+        totalLayout.addWidget(thisWidget, 0)
+        totalLayout.addWidget(QWidget(), 1)
+        totalLayout.addWidget(self.progressBar, 0)
 
     def update(self, action: SgAction):
         if action.state == SgExperimentStates.Progress:
@@ -662,9 +700,6 @@ class SgExperimentImportDirectoryDataComponent(SgComponent):
                 self.progressBar.setValue(self.container.progress)
                 if self.container.progress == 100:
                     self.progressBar.setVisible(False)
-
-    def cancelButtonClicked(self):
-        self.container.emit(SgExperimentStates.CancelImport)
 
     def importButtonClicked(self):
         self.container.import_info.dir_data_path = self.dataPath.text()
@@ -701,7 +736,7 @@ class SgExperimentTagComponent(SgComponent):
         self.widget.setAttribute(qtpy.QtCore.Qt.WA_StyledBackground, True)
         self.widget.setObjectName("SgWidget")
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(5, 5, 5, 5)
         self.widget.setLayout(layout)
         tabWidget = QTabWidget()
         layout.addWidget(tabWidget)
@@ -749,6 +784,7 @@ class SgExperimentTagsListComponent(SgComponent):
         addWidget.setLayout(addLayout)
 
         self.addEdit = QLineEdit(self.widget)
+        self.addEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
         addButton = QPushButton(self.widget.tr("Add"))
         addButton.setObjectName("btnDefault")
         addLayout.addWidget(self.addEdit)
@@ -757,10 +793,12 @@ class SgExperimentTagsListComponent(SgComponent):
         self.tagListWidget = QWidget()
         self.tagListWidget.setObjectName("SgWidget")
         self.tagListLayout = QVBoxLayout()
+        self.tagListLayout.addStretch()
         self.tagListWidget.setLayout(self.tagListLayout)
+        self.tagListWidget.setFixedHeight(400)
 
         scrollArea = QScrollArea()
-        scrollArea.setWidgetResizable(True)
+        scrollArea.setWidgetResizable(False)
         scrollArea.setObjectName("SgWidget")
         scrollArea.setWidget(self.tagListWidget)
 
@@ -779,8 +817,9 @@ class SgExperimentTagsListComponent(SgComponent):
 
         layout.addWidget(title, 0, qtpy.QtCore.Qt.AlignTop)
         layout.addWidget(addWidget, 0, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(scrollArea, 1)
-        layout.addWidget(buttonsWidget, 0, qtpy.QtCore.Qt.AlignBottom)
+        layout.addWidget(scrollArea, 0)
+        layout.addWidget(buttonsWidget, 0)
+        layout.addWidget(QWidget(), 1, qtpy.QtCore.Qt.AlignTop)
 
         addButton.released.connect(self.addButtonClicked)
         cancelButton.released.connect(self.cancelButtonClicked)
@@ -794,14 +833,17 @@ class SgExperimentTagsListComponent(SgComponent):
     def reload(self):
         # free layout
         for i in reversed(range(self.tagListLayout.count())):
-            self.tagListLayout.itemAt(i).widget().deleteLater()
+            if self.tagListLayout.itemAt(i).widget():
+                self.tagListLayout.itemAt(i).widget().deleteLater()
 
         # add tags
         for tag in self.container.experiment.tag_keys:
             tagWidget = SgTagWidget()
             tagWidget.setContent(tag)
             tagWidget.remove.connect(self.removeClicked)
-            self.tagListLayout.addWidget(tagWidget)
+            self.tagListLayout.insertWidget(self.tagListLayout.count()-1,
+                                            tagWidget, 0)
+
         self.tagListWidget.adjustSize()
 
     def addButtonClicked(self):
@@ -809,7 +851,9 @@ class SgExperimentTagsListComponent(SgComponent):
             tagWidget = SgTagWidget()
             tagWidget.setContent(self.addEdit.text())
             tagWidget.remove.connect(self.removeClicked)
-            self.tagListLayout.addWidget(tagWidget)
+            self.tagListLayout.insertWidget(self.tagListLayout.count()-1,
+                                            tagWidget, 0)
+            #self.tagListLayout.addWidget(tagWidget, 0)
             self.addEdit.setText("")
             self.tagListLayout.update()
 
@@ -830,11 +874,12 @@ class SgExperimentTagsListComponent(SgComponent):
     def removeClicked(self, tag: str):
         for i in range(self.tagListLayout.count()):
             item = self.tagListLayout.itemAt(i)
-            widget = item.widget()
-            if widget:
-                if widget.content() == tag:
-                    itemd = self.tagListLayout.takeAt(i)
-                    itemd.widget().deleteLater()
+            if item:
+                widget = item.widget()
+                if widget:
+                    if widget.content() == tag:
+                        itemd = self.tagListLayout.takeAt(i)
+                        itemd.widget().deleteLater()
         self.tagListWidget.adjustSize()
 
     def get_widget(self):
@@ -856,7 +901,7 @@ class SgExperimentTagsUsingSeparatorsComponent(SgComponent):
         self.widget.setObjectName("SgWidget")
 
         layout = QGridLayout()
-        self.widget.setLayout(layout)
+        layout.setContentsMargins(0, 0, 0, 0)
 
         # title
         title = QLabel(self.widget.tr("Tag using separator"))
@@ -865,6 +910,7 @@ class SgExperimentTagsUsingSeparatorsComponent(SgComponent):
         gridWidget = QWidget()
         self.gridLayout = QGridLayout()
         gridWidget.setLayout(self.gridLayout)
+        gridWidget.setContentsMargins(0, 0, 0, 0)
 
         tagLabel = QLabel(self.widget.tr("Tag"))
         tagLabel.setObjectName("SgWidget")
@@ -874,8 +920,10 @@ class SgExperimentTagsUsingSeparatorsComponent(SgComponent):
         positionLabel.setObjectName("SgWidget")
 
         tagsEdit = QLineEdit()
+        tagsEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
         self._tagsEdit.append(tagsEdit)
         separatorEdit = QLineEdit()
+        separatorEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
         self._separatorEdit.append(separatorEdit)
         positionSpinBox = QSpinBox()
         self._positionSpinBox.append(positionSpinBox)
@@ -899,9 +947,17 @@ class SgExperimentTagsUsingSeparatorsComponent(SgComponent):
         self.gridLayout.addWidget(positionSpinBox, 1, 2)
 
         layout.addWidget(gridWidget, 1, 0, 1, 3)
-        layout.addWidget(addLineButton, 2, 0)
-        layout.addWidget(validateButton, 3, 2)
-        layout.addWidget(QWidget())
+        layout.addWidget(addLineButton, 2, 0, 1, 1,  qtpy.QtCore.Qt.AlignLeft)
+        layout.addWidget(validateButton, 3, 2, 1, 1, qtpy.QtCore.Qt.AlignRight)
+
+        mainWidget = QWidget()
+        mainWidget.setLayout(layout)
+
+        globalLayout = QVBoxLayout()
+        self.widget.setLayout(globalLayout)
+
+        globalLayout.addWidget(mainWidget, 0)
+        globalLayout.addWidget(QWidget(), 1)
 
     def validated(self):
         tags = []
@@ -921,8 +977,10 @@ class SgExperimentTagsUsingSeparatorsComponent(SgComponent):
 
     def addLine(self):
         tagsEdit = QLineEdit()
+        tagsEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
         self._tagsEdit.append(tagsEdit)
         separatorEdit = QLineEdit()
+        separatorEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
         self._separatorEdit.append(separatorEdit)
         positionSpinBox = QSpinBox()
         self._positionSpinBox.append(positionSpinBox)
@@ -953,7 +1011,7 @@ class SgExperimentTagsUsingNameComponent(SgComponent):
         self.widget.setObjectName("SgWidget")
 
         layout = QGridLayout()
-        self.widget.setLayout(layout)
+        layout.setContentsMargins(0, 0, 0, 0)
 
         # title
         title = QLabel(self.widget.tr("Tag using name"))
@@ -962,6 +1020,7 @@ class SgExperimentTagsUsingNameComponent(SgComponent):
         tagLabel = QLabel(self.widget.tr("Tag:"))
         tagLabel.setObjectName("SgWidget")
         self.tagEdit = QLineEdit()
+        self.tagEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
 
         searchLabel = QLabel(self.widget.tr("Search names:"))
         searchLabel.setObjectName("SgWidget")
@@ -971,6 +1030,7 @@ class SgExperimentTagsUsingNameComponent(SgComponent):
         searchWidget.setLayout(self.searchLayout)
 
         nameEdit = QLineEdit()
+        nameEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
         self._namesEdit.append(nameEdit)
         self.searchLayout.addWidget(nameEdit)
 
@@ -982,14 +1042,22 @@ class SgExperimentTagsUsingNameComponent(SgComponent):
         validateButton.setObjectName('btnPrimary')
         validateButton.released.connect(self.validated)
 
-        layout.addWidget(title, 0, 0)
+        layout.addWidget(title, 0, 0, 1, 2)
         layout.addWidget(tagLabel, 1, 0, 1, 1, qtpy.QtCore.Qt.AlignTop)
         layout.addWidget(self.tagEdit, 1, 1)
         layout.addWidget(searchLabel, 2, 0, 1, 1, qtpy.QtCore.Qt.AlignTop)
         layout.addWidget(searchWidget, 2, 1)
         layout.addWidget(addLineButton, 3, 1)
         layout.addWidget(validateButton, 4, 2)
-        layout.addWidget(QWidget())
+
+        mainWidget = QWidget()
+        mainWidget.setLayout(layout)
+
+        globalLayout = QVBoxLayout()
+        self.widget.setLayout(globalLayout)
+
+        globalLayout.addWidget(mainWidget, 0)
+        globalLayout.addWidget(QWidget(), 1)
 
     def validated(self):
         names = []
@@ -1001,6 +1069,7 @@ class SgExperimentTagsUsingNameComponent(SgComponent):
 
     def addLine(self):
         nameEdit = QLineEdit()
+        nameEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
         self._namesEdit.append(nameEdit)
         self.searchLayout.addWidget(nameEdit)
 

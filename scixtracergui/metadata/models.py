@@ -20,15 +20,16 @@ class SgRawDataModel(SgModel):
         self._object_name = 'SgRawDataModel'
         self.container = container
         self.container.register(self)
+        self.req = sx.Request()
 
     def update(self, action: SgAction):
         if action.state == SgRawDataStates.URIChanged:
-            self.container.rawdata = RawData(self.container.md_uri)
+            self.container.rawdata = self.req.get_rawdata(self.container.md_uri)
             self.container.emit(SgRawDataStates.Loaded)
             return
 
         if action.state == SgRawDataStates.SaveClicked:
-            self.container.rawdata.write()
+            self.req.update_rawdata(self.container.rawdata)
             self.container.emit(SgRawDataStates.Saved)
             return
 
@@ -39,10 +40,16 @@ class SgProcessedDataModel(SgModel):
         self._object_name = 'SgProcessedDataModel'
         self.container = container
         self.container.register(self)
+        self.req = sx.Request()
 
     def update(self, action: SgAction):
         if action.state == SgProcessedDataStates.URIChanged:
-            self.container.processeddata = ProcessedData(self.container.md_uri)
+            self.container.processeddata = \
+                self.req.get_processeddata(self.container.md_uri)
+            self.container.processed_origin = \
+                self.req.get_origin(self.container.processeddata)
+            self.container.processed_parent = \
+                self.req.get_parent(self.container.processeddata)
             self.container.emit(SgProcessedDataStates.Loaded)
             return    
 
@@ -53,10 +60,11 @@ class SgRunModel(SgModel):
         self._object_name = 'SgRunModel'
         self.container = container
         self.container.register(self)
+        self.req = sx.Request()
 
     def update(self, action: SgAction):
         if action.state == SgRunStates.URIChanged:
-            self.container.run = Run(self.container.md_uri)
+            self.container.run = self.req.get_run(self.container.md_uri)
             self.container.emit(SgRunStates.Loaded)
             return  
 

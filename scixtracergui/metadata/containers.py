@@ -20,7 +20,9 @@ class SgProcessedDataContainer(SgContainer):
 
         # data
         self.md_uri = '' 
-        self.processeddata = None     
+        self.processeddata = None
+        self.processed_origin = None
+        self.processed_parent = None
 
 
 class SgRunContainer(SgContainer):

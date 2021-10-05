@@ -66,11 +66,10 @@ class SgExperimentModel(SgModel):
             self.container.emit(SgExperimentStates.DataImported)
 
         if action.state == SgExperimentStates.TagsModified:
-            for tag in self.container.tag_info.tags:
-                self.req.set_tag_key(
-                    experiment=self.container.experiment,
-                    key=tag
-                )
+            self.req.set_tag_keys(
+                experiment=self.container.experiment,
+                keys=self.container.tag_info.tags
+            )
             self.container.emit(SgExperimentStates.TagsSaved)
 
         if action.state == SgExperimentStates.TagUsingSeparators:

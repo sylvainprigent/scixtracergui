@@ -19,12 +19,13 @@ class SgExperimentStates(SgStates):
     DataImported = "SgExperimentStates.DataImported"
     TagsSaved = "SgExperimentStates.TagsSaved"
     DataTagged = "SgExperimentStates.DataTagged"
-    CancelImport = "SgExperimentStates.CancelImport"
     CancelTag = "SgExperimentStates.CancelTag"
     HomeClicked = "SgExperimentStates.HomeClicked"
     ViewDataClicked = "SgExperimentStates.ViewDataClicked"
     ViewRawMetaDataClicked = "SgExperimentStates.ViewRawMetaDataClicked"
-    ViewProcessedMetaDataClicked = "SgExperimentStates.ViewProcessedMetaDataClicked"
+    ViewProcessedMetaDataClicked = \
+        "SgExperimentStates.ViewProcessedMetaDataClicked"
+    MainPageClicked = "SgExperimentStates.MainPageClicked"
 
 
 class SgExperimentCreateStates(SgStates):

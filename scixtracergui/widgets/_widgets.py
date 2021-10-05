@@ -5,7 +5,7 @@ from qtpy.QtGui import QMouseEvent, QDrag, QCursor
 from qtpy.QtWidgets import (QWidget, QLabel, QPushButton, QToolButton,
                             QFileDialog, QHBoxLayout, QLineEdit, QVBoxLayout,
                             QLayout, QLayoutItem, QSizePolicy, QStyle,
-                            QStackedWidget)
+                            QStackedWidget, QToolBar)
 from qtpy.QtCore import QObject, Signal, Slot, QUrl
 
 
@@ -132,7 +132,7 @@ class SgTagWidget(QWidget):
         return self.tagName.text()
 
     def emitRemove(self):
-        self.remove(self.tagName.text())
+        self.remove.emit((self.tagName.text()))
 
 
 class SgFlowLayout(QLayout):
