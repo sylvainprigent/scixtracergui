@@ -904,9 +904,9 @@ QToolButton:disabled {
 blForm
  // /////////////////////////////////////////////// */
 #SgLabelFormHeader1{
-    color: #0071C3;
+    color: #f0f1f2;
     font: bold;
-    border-top : 2px solid #0071C3;
+    border-top : 2px solid #f0f1f2;
     text-transform: uppercase;
     padding-left: 0px;
     margin-left: 0px;
@@ -1376,8 +1376,8 @@ QLabel#SgBrowserShortCutsTitle{
 
 .QLabel#SgMetadataTitle{
   background-color: #262930;
-  color: #0071C3;
-  border-top: 1px solid #0071C3;
+  color: #f0f1f2;
+  border-top: 1px solid #f0f1f2;
 }
 
  /* ///////////////////////////////////
