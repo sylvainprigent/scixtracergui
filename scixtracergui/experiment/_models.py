@@ -1,9 +1,9 @@
 import scixtracer as sx
 
 from scixtracergui.framework import SgModel, SgAction
-from scixtracergui.experiment.states import (SgExperimentCreateStates,
+from ._states import (SgExperimentCreateStates,
                                              SgExperimentStates)
-from scixtracergui.experiment.containers import (SgExperimentCreateContainer,
+from ._containers import (SgExperimentCreateContainer,
                                                  SgExperimentContainer)
 
 

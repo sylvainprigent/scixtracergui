@@ -7,20 +7,21 @@ from qtpy.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
                             QHeaderView)
 
 import scixtracer as sx
+from scixtracer.config import ConfigAccess
 from scixtracergui.framework import SgComponent, SgAction
 from scixtracergui.widgets import SgTagWidget, SgButton
-from scixtracergui.experiment.containers import (SgExperimentCreateContainer,
-                                                 SgExperimentContainer,
-                                                 SgExperimentHomeContainer)
-from scixtracergui.experiment.states import (SgExperimentCreateStates,
-                                             SgExperimentStates,
-                                             SgExperimentHomeStates)
+from ._containers import (SgExperimentCreateContainer,
+                          SgExperimentContainer,
+                          SgExperimentHomeContainer)
+from ._states import (SgExperimentCreateStates,
+                      SgExperimentStates,
+                      SgExperimentHomeStates)
 
 
 class SgExperimentHomeComponent(SgComponent):
     def __init__(self, container: SgExperimentHomeContainer):
         super().__init__()
-        self._object_name = 'SgExperimentCreateComponent'
+        self._object_name = 'SgExperimentHomeComponent'
         self.container = container
         self.container.register(self)
 
@@ -55,8 +56,10 @@ class SgExperimentHomeComponent(SgComponent):
 
 
 class SgExperimentCreateComponent(SgComponent):
-    def __init__(self, container: SgExperimentCreateContainer,
-                 default_destination: str = ""):
+    def __init__(self, container: SgExperimentCreateContainer
+
+                
+):
         super().__init__()
         self._object_name = 'SgExperimentCreateComponent'
         self.container = container
@@ -76,7 +79,7 @@ class SgExperimentCreateComponent(SgComponent):
         destinationLabel.setObjectName("SgLabel")
         self.destinationEdit = QLineEdit()
         self.destinationEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
-        self.destinationEdit.setText(default_destination)
+        self.destinationEdit.setText(ConfigAccess.instance().get('workspace'))
         browseButton = QPushButton(self.widget.tr("..."))
         browseButton.setObjectName("btnDefault")
         browseButton.released.connect(self.browseButtonClicked)
@@ -90,6 +93,7 @@ class SgExperimentCreateComponent(SgComponent):
         authorLabel.setObjectName("SgLabel")
         self.authorEdit = QLineEdit()
         self.authorEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
+        self.authorEdit.setText(ConfigAccess.instance().get('user')['name']) 
 
         createButton = QPushButton(self.widget.tr("Create"))
         createButton.setObjectName("btnPrimary")
@@ -182,13 +186,6 @@ class SgExperimentToolbarComponent(SgComponent):
         layout = QHBoxLayout()
         layout.setSpacing(1)
         self.widget.setLayout(layout)
-
-        # home
-        homeButton = QToolButton()
-        homeButton.setObjectName("SgExperimentToolBarHomeButton")
-        homeButton.setToolTip(self.widget.tr("Home"))
-        homeButton.released.connect(self.homeButtonClicked)
-        layout.addWidget(homeButton, 0, qtpy.QtCore.Qt.AlignLeft)
 
         # info
         infoButton = QToolButton()

@@ -2,9 +2,13 @@ from ._widgets import (SgButton, SgToolButton, SgFileSelectWidget, SgDragLabel,
                        SgTagWidget, SgFlowLayout, SgNavigationBar,
                        SgHideableWidget, SgClosableButton,
                        SgStaticStackedWidget, SgSlidingStackedWidget,
-                       SgKeyValueView)
+                       SgKeyValueView, SgAppBar)
+from ._theme import SgTheme, SgThemeAccess                       
 
-__all__ = ['SgButton',
+
+__all__ = ['SgTheme',
+           'SgThemeAccess', 
+           'SgButton',
            'SgToolButton',
            'SgFileSelectWidget',
            'SgDragLabel',
@@ -15,5 +19,6 @@ __all__ = ['SgButton',
            'SgClosableButton',
            'SgStaticStackedWidget',
            'SgSlidingStackedWidget',
-           'SgKeyValueView'
+           'SgKeyValueView',
+           'SgAppBar'
            ]

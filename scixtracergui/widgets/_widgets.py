@@ -1,7 +1,7 @@
 import qtpy.QtCore
 from qtpy.QtCore import (QMimeData, QSize, QRect, QPoint, QPropertyAnimation,
                          QEasingCurve, QParallelAnimationGroup)
-from qtpy.QtGui import QMouseEvent, QDrag, QCursor
+from qtpy.QtGui import QMouseEvent, QDrag, QCursor, QIcon
 from qtpy.QtWidgets import (QWidget, QLabel, QPushButton, QToolButton,
                             QFileDialog, QHBoxLayout, QLineEdit, QVBoxLayout,
                             QLayout, QLayoutItem, QSizePolicy, QStyle,
@@ -433,7 +433,7 @@ class SgClosableButton(QPushButton):
             layout = QVBoxLayout()
             layout.setContentsMargins(0, 0, 0, 0)
             closeButton = QPushButton()
-            closeButton.setObjectName("BiCloseButton")
+            closeButton.setObjectName("SgCloseButton")
             closeButton.setFixedSize(12, 12)
             layout.addWidget(closeButton, 1, qtpy.QtCore.Qt.AlignTop |
                              qtpy.QtCore.Qt.AlignRight)
@@ -647,3 +647,76 @@ class SgSlidingStackedWidget(QStackedWidget):
         self.widget(self.now).move(self.pnow)
         self.active = False
         self.animationFinished.emit()
+
+
+class SgAppBar(QWidget):
+    open = Signal(int)
+    close = Signal(int)
+
+    def __init__(self):
+        super().__init__()
+
+        self.layout = QVBoxLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.addWidget(QWidget(), 1, qtpy.QtCore.Qt.AlignTop)
+
+        # global
+        layout = QHBoxLayout()
+        w = QWidget()
+        w.setObjectName("SgHomeToolBar")
+        layout.addWidget(w, 1, qtpy.QtCore.Qt.AlignHCenter)
+        layout.setContentsMargins(0, 7, 0, 0)
+        w.setLayout(self.layout)
+
+        # total
+        tlayout = QHBoxLayout()
+        wt = QWidget()
+        tlayout.addWidget(wt, 1, qtpy.QtCore.Qt.AlignHCenter)
+        tlayout.setContentsMargins(0, 0, 0, 0)
+        wt.setLayout(layout)
+        wt.setObjectName("SgHomeToolBar")
+        wt.setFixedWidth(52)
+        self.setFixedWidth(52)
+        self.setLayout(tlayout)
+
+    def addButton(self, icon: str, toolTip: str, id: int, closable: bool):
+        button = SgClosableButton(closable, self)
+        button.setObjectName('SgHomeToolBarButton')
+        button.setCheckable(True)
+        button.setIcon(QIcon(icon))
+        if (toolTip != ""):
+            button.setToolTip(toolTip)
+        button.setId(id)
+        self.layout.insertWidget(self.layout.count() -1, button, 0, qtpy.QtCore.Qt.AlignHCenter)
+
+        button.clicked.connect(self.open)
+        button.closed.connect(self.close)
+
+    def print_buttons(self):
+        for i in range(self.layout.count()-1, -1, -1):
+            item = self.layout.itemAt(i)
+            button = item.widget()
+            if button:
+                if isinstance(button, SgClosableButton):
+                    print("button:", button.id())
+
+    def removeButton(self, id: int):
+        for i in range(self.layout.count()-1, -1, -1):
+            item = self.layout.itemAt(i)
+            button = item.widget()
+            if button:
+                if isinstance(button, SgClosableButton):
+                    if (button.id() == id):
+                        button.deleteLater()
+                    elif button.id() > id:
+                        button.setId(button.id()-1)              
+
+    def setChecked(self, id: int, update_current: bool):
+        for i in range(0, self.layout.count()):
+            button = self.layout.itemAt(i).widget()
+            if isinstance(button, SgClosableButton):
+                if button.id() == id and update_current:
+                    button.setChecked(True)   
+                else:
+                    button.setChecked(False)          
+    

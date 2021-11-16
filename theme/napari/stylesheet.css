@@ -1556,3 +1556,75 @@ QLabel#SgKeyValueViewValue
   border-bottom-right-radius: 7px;
   padding-left: 14px;
 }
+
+/* ************************************
+*  Home component
+****************************************/
+QWidget#SgHomeTile{
+  background-color: #414851;
+  color: #e1e1e1;
+  min-height: 100px;
+  max-height: 100px;
+  max-width: 100px;
+  min-width: 100px;
+  border-radius: 4px;
+  border: 2px solid #414851;
+}
+
+QWidget#SgHomeTile:hover{
+  background-color: #5A626C;
+  border: 2px solid #262930;
+}
+
+QLabel#SgHomeTileTitle{
+  color: #f0f1f2;
+  font-weight: bold;
+  /*margin-bottom: 7px;*/
+}
+
+QLabel#SgHomeEmpty{
+  min-height: 350px;
+  max-height: 350px;
+  max-width: 450px;
+  min-width: 450px;
+  background-color: #242830;
+  border-radius: 8px;
+  color: #5A626C;
+  qproperty-alignment: AlignCenter;
+}
+
+/* // ///////////////////////////////////////////////
+ SgMainWindowToolBar
+// /////////////////////////////////////////////// */
+#SgHomeToolBar{
+	background-color: #5A626C;
+}
+
+#SgHomeToolBar:handle{
+	background-color: #5A626C;
+}
+
+QPushButton#SgHomeToolBarButton{
+	border: none;
+  min-height: 40px;
+  max-height: 40px;
+  max-width: 40px;
+  min-width: 40px;
+	border-bottom-right-radius: 9px;
+  border-bottom-left-radius: 9px;
+  border-top-right-radius: 9px;
+  border-top-left-radius: 9px;
+  background-color: #5A626C;
+}
+QPushButton#SgHomeToolBarButton:hover{
+	background-color: #414851;
+}
+QPushButton#SgHomeToolBarButton:pressed{
+	background-color: #5A626C;
+}
+QPushButton#SgHomeToolBarButton:checked{
+	background-color: #0071C3;
+}
+QPushButton#SgHomeToolBarButton:disabled{
+	background-color: #5A626C;
+}

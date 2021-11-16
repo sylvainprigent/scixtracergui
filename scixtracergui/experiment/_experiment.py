@@ -2,8 +2,6 @@ import qtpy
 from qtpy.QtWidgets import (QWidget, QVBoxLayout, QMessageBox, QTabWidget,
                             QLabel)
 
-from scixtracergui.experiment.containers import (SgExperimentContainer)
-from scixtracergui.experiment.states import (SgExperimentStates)
 from scixtracergui.framework import SgComponent, SgAction
 
 from scixtracergui.metadata.containers import (SgMetadataExperimentContainer,
@@ -23,50 +21,56 @@ from scixtracergui.metadata.states import (SgMetadataExperimentStates,
                                            SgProcessedDataStates,
                                            SgRunStates)
 
-from .components import (SgExperimentToolbarComponent,
+from ._components import (SgExperimentToolbarComponent,
                          SgExperimentTableComponent,
                          SgExperimentImportComponent,
                          SgExperimentTagComponent,
                          SgExperimentMetaToolbarComponent
                          )
-from .models import SgExperimentModel
+from ._containers import (SgExperimentContainer)
+from ._states import (SgExperimentStates)   
+from ._models import SgExperimentModel
 
 
 class SgExperimentComponent(SgComponent):
-    def __init__(self):
+    def __init__(self, experiment_uri):
         super().__init__()
 
         # container
-        self.expContainer = SgExperimentContainer()
+        self.experimentContainer = SgExperimentContainer()
         self.infoContainer = SgMetadataExperimentContainer()
         self.rawDataContainer = SgRawDataContainer()
         self.processedDataContainer = SgProcessedDataContainer()
         self.runContainer = SgRunContainer()
 
         # components
-        self.toolbarComponent = SgExperimentToolbarComponent(self.expContainer)
-        self.tableComponent = SgExperimentTableComponent(self.expContainer)
-        self.importComponent = SgExperimentImportComponent(self.expContainer)
-        self.tagComponent = SgExperimentTagComponent(self.expContainer)
+        self.toolbarComponent = SgExperimentToolbarComponent(self.experimentContainer)
+        self.tableComponent = SgExperimentTableComponent(self.experimentContainer)
+        self.importComponent = SgExperimentImportComponent(self.experimentContainer)
+        self.tagComponent = SgExperimentTagComponent(self.experimentContainer)
 
-        self.metaToolbarComponent = SgExperimentMetaToolbarComponent(self.expContainer)
+        self.metaToolbarComponent = SgExperimentMetaToolbarComponent(self.experimentContainer)
         self.infoComponent = SgMetadataExperimentComponent(self.infoContainer)
         self.rawDataComponent = SgRawDataComponent(self.rawDataContainer)
         self.processedDataComponent = SgProcessedDataComponent(self.processedDataContainer)
         self.runComponent = SgMetadataRunComponent(self.runContainer)
 
         # models
-        self.experimentModel = SgExperimentModel(self.expContainer)
+        self.experimentModel = SgExperimentModel(self.experimentContainer)
         self.infoModel = SgMetadataExperimentModel(self.infoContainer)
         self.rawDataModel = SgRawDataModel(self.rawDataContainer)
         self.processedDataModel = SgProcessedDataModel(self.processedDataContainer)
         self.runModel = SgRunModel(self.runContainer)
 
         # connections
-        self.expContainer.register(self)
+        self.experimentContainer.register(self)
         self.infoContainer.register(self)
         self.rawDataContainer.register(self)
         self.processedDataContainer.register(self)
+
+        # init
+        self.experimentContainer.experiment_uri = experiment_uri
+        self.experimentContainer.emit(SgExperimentStates.ExperimentLoad)
 
         # create the widget
         self.widget = QWidget()
@@ -118,8 +122,8 @@ class SgExperimentComponent(SgComponent):
             self.toolbarComponent.get_widget().setVisible(False)
             self.tableComponent.get_widget().setVisible(False)
         if action.state == SgExperimentStates.ExperimentLoaded:
-            self.infoContainer.md_uri = self.expContainer.experiment_uri
-            self.infoContainer.experiment = self.expContainer.experiment
+            self.infoContainer.md_uri = self.experimentContainer.experiment_uri
+            self.infoContainer.experiment = self.experimentContainer.experiment
             self.infoContainer.emit(SgMetadataExperimentStates.Loaded)
         if action.state == SgExperimentStates.TagsSaved or \
                 action.state == SgExperimentStates.DataTagged:
@@ -169,7 +173,7 @@ class SgExperimentComponent(SgComponent):
             self.toolbarComponent.get_widget().setVisible(True)
             self.tableComponent.get_widget().setVisible(True)
         if action.state == SgExperimentStates.ViewRawMetaDataClicked:
-            self.rawDataContainer.md_uri = self.expContainer.selected_data_info.md_uri
+            self.rawDataContainer.md_uri = self.experimentContainer.selected_data_info.md_uri
             self.rawDataContainer.emit(SgRawDataStates.URIChanged)
             self.metaToolbarComponent.get_widget().setVisible(True)
             self.rawDataComponent.get_widget().setVisible(True)
@@ -182,7 +186,7 @@ class SgExperimentComponent(SgComponent):
             self.tableComponent.get_widget().setVisible(True)
             self.tableComponent.drawRawDataset()
         if action.state == SgExperimentStates.ViewProcessedMetaDataClicked:
-            self.processedDataContainer.md_uri = self.expContainer.selected_data_info.md_uri
+            self.processedDataContainer.md_uri = self.experimentContainer.selected_data_info.md_uri
             self.processedDataContainer.emit(SgProcessedDataStates.URIChanged)
             self.metaToolbarComponent.get_widget().setVisible(True)
             self.processedDataWidget.setVisible(True)
@@ -196,5 +200,5 @@ class SgExperimentComponent(SgComponent):
         return self.widget
 
     def load_experiment(self, experiment_uri):
-        self.expContainer.experiment_uri = experiment_uri
-        self.expContainer.emit(SgExperimentStates.ExperimentLoad)
+        self.experimentContainer.experiment_uri = experiment_uri
+        self.experimentContainer.emit(SgExperimentStates.ExperimentLoad)
