@@ -1,15 +1,18 @@
+import os
+import getpass
+from pathlib import Path
+
 import qtpy.QtCore
-from qtpy.QtWidgets import (QWidget, QLabel, QVBoxLayout, QScrollArea,
-                            QTableWidget, QTableWidgetItem,
-                            QAbstractItemView, QGridLayout, QHBoxLayout,
-                            QToolButton, QSplitter, QLineEdit, QPushButton,
-                            QTextEdit, QMessageBox, QFileDialog)
+from qtpy.QtWidgets import (QWidget, QLabel, QVBoxLayout,
+                               QTableWidget, QTableWidgetItem,
+                               QAbstractItemView, QHBoxLayout,
+                               QToolButton, QSplitter, QLineEdit)
 
 from scixtracergui.framework import SgComponent, SgAction
-from scixtracergui.widgets import SgButton
-from scixtracergui.browser.states import SgBrowserStates
-from scixtracergui.browser.containers import SgBrowserContainer
-from scixtracergui.browser.models import SgBrowserModel
+from scixtracergui.widgets import SgThemeAccess
+from ._states import SgBrowserStates
+from ._containers import SgBrowserContainer
+from ._widgets import SgShortcutButton
 
 
 class SgBrowserComponent(SgComponent):
@@ -19,17 +22,16 @@ class SgBrowserComponent(SgComponent):
         self.container = container
         self.container.register(self)  
 
-        self.browserModel = SgBrowserModel(self.container, True)
         self.toolBarComponent = SgBrowserToolBarComponent(self.container)
         self.shortCutComponent = SgBrowserShortCutsComponent(self.container)
         self.tableComponent = SgBrowserTableComponent(self.container)
 
         self.widget = QWidget()
-        self.widget.setObjectName("SgSideBar")
+        self.widget.setObjectName("SgWidget")
         self.widget.setAttribute(qtpy.QtCore.Qt.WA_StyledBackground, True)
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(0,0,0,0)
         layout.setSpacing(0)
         self.widget.setLayout(layout)
 
@@ -82,29 +84,23 @@ class SgBrowserToolBarComponent(SgComponent):
 
         # up
         upButton = QToolButton()
-        upButton.setObjectName("SgExperimentToolBarUpButton")
+        upButton.setObjectName("SgBrowserToolBarUpButton")
         upButton.setToolTip(self.widget.tr("Tags"))
         upButton.released.connect(self.upButtonClicked)
         layout.addWidget(upButton, 0, qtpy.QtCore.Qt.AlignLeft)
 
         # up
         refreshButton = QToolButton()
-        refreshButton.setObjectName("SgExperimentToolBarRefreshButton")
+        refreshButton.setObjectName("SgBrowserToolBarRefreshButton")
         refreshButton.setToolTip(self.widget.tr("Tags"))
         refreshButton.released.connect(self.refreshButtonClicked)
         layout.addWidget(refreshButton, 0, qtpy.QtCore.Qt.AlignLeft)
 
         # data selector
         self.pathLineEdit = QLineEdit(self.widget)
+        self.pathLineEdit.setAttribute(qtpy.QtCore.Qt.WA_MacShowFocusRect, False)
         self.pathLineEdit.returnPressed.connect(self.pathEditReturnPressed)
         layout.addWidget(self.pathLineEdit, 1)
-
-        # bookmark
-        bookmarkButton = QToolButton()
-        bookmarkButton.setObjectName("SgExperimentToolBarBookmarkButton")
-        bookmarkButton.setToolTip(self.widget.tr("Bookmark"))
-        bookmarkButton.released.connect(self.bookmarkButtonClicked)
-        layout.addWidget(bookmarkButton, 0, qtpy.QtCore.Qt.AlignLeft)
 
     def update(self, action: SgAction):
         if action.state == SgBrowserStates.FilesInfoLoaded:
@@ -127,23 +123,14 @@ class SgBrowserToolBarComponent(SgComponent):
         self.container.setCurrentPath(self.pathLineEdit.text())
         self.container.emit(SgBrowserStates.RefreshClicked)
 
-    def bookmarkButtonClicked(self):
-        msgBox = QMessageBox()
-        msgBox.setText("Want to bookmark this directory ?")
-        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        msgBox.setDefaultButton(QMessageBox.Yes)
-        ret = msgBox.exec_()
-        if ret:
-            self.container.emit(SgBrowserStates.BookmarkClicked)
-
     def get_widget(self): 
         return self.widget            
        
 
 class SgBrowserShortCutsComponent(SgComponent):
     def __init__(self, container: SgBrowserContainer):
-        super(SgBrowserShortCutsComponent, self).__init__()
-        self._object_name = 'SgBrowserPreviewComponent'
+        super().__init__()
+        self._object_name = 'SgBrowserShortCutsComponent'
         self.container = container
         self.container.register(self)
 
@@ -161,14 +148,38 @@ class SgBrowserShortCutsComponent(SgComponent):
         layout = QVBoxLayout()
         self.wwidget.setLayout(layout)
 
-        addExpermentbutton = QPushButton(self.wwidget.tr("New Experiment"))
-        addExpermentbutton.setObjectName("SgBrowserShortCutsNewButton")
-        addExpermentbutton.released.connect(self.newExperimentClicked)
-        layout.addWidget(addExpermentbutton, 0, qtpy.QtCore.Qt.AlignTop)
+        home_dir = Path.home() 
+        username = getpass.getuser()
 
-        separatorLabel = QLabel(self.wwidget.tr("Bookmarks"), self.wwidget)
-        layout.addWidget(separatorLabel, 0, qtpy.QtCore.Qt.AlignTop)
-        separatorLabel.setObjectName("SgBrowserShortCutsTitle")
+        homeButton = SgShortcutButton(username, SgThemeAccess.instance().icon('home'))
+        homeButton.setObjectName("SgBrowserHomeButton")
+        homeButton.content = os.path.join(home_dir)
+        homeButton.setCursor(qtpy.QtCore.Qt.PointingHandCursor)
+        homeButton.clickedContent.connect(self.buttonClicked)
+
+        desktopButton = SgShortcutButton('Desktop', SgThemeAccess.instance().icon('desktop'))
+        desktopButton.setObjectName("SgBrowserDesktopButton")
+        desktopButton.content = os.path.join(home_dir, 'Desktop')
+        desktopButton.setCursor(qtpy.QtCore.Qt.PointingHandCursor)
+        desktopButton.clickedContent.connect(self.buttonClicked)
+
+        documentsButton = SgShortcutButton('Documents', SgThemeAccess.instance().icon('open-folder_negative'))
+        documentsButton.setObjectName("SgBrowserDocumentsButton")
+        documentsButton.content = os.path.join(home_dir, 'Documents')
+        documentsButton.setCursor(qtpy.QtCore.Qt.PointingHandCursor)
+        documentsButton.clickedContent.connect(self.buttonClicked)
+
+        downloadsButton = SgShortcutButton('Downloads', SgThemeAccess.instance().icon('download'))
+        downloadsButton.setObjectName("SgBrowserDownloadsButton")
+        downloadsButton.content = os.path.join(home_dir, 'Downloads')
+        downloadsButton.setCursor(qtpy.QtCore.Qt.PointingHandCursor)
+        downloadsButton.clickedContent.connect(self.buttonClicked)
+
+        layout.addWidget(homeButton)
+        layout.addWidget(desktopButton)
+        layout.addWidget(documentsButton)
+        layout.addWidget(downloadsButton)
+        layout.setSpacing(2)
 
         bookmarkWidget = QWidget(self.wwidget)
         self.layout = QVBoxLayout()
@@ -177,35 +188,15 @@ class SgBrowserShortCutsComponent(SgComponent):
         bookmarkWidget.setLayout(self.layout)
 
         layout.addWidget(bookmarkWidget, 0, qtpy.QtCore.Qt.AlignTop)
-        layout.addWidget(QWidget(), 1, qtpy.QtCore.Qt.AlignTop)
+        layout.addWidget(QWidget(), 1, qtpy.QtCore.Qt.AlignTop) 
 
-    def reloadBookmarks(self):
-
-        # free layout
-        for i in reversed(range(self.layout.count())): 
-            self.layout.itemAt(i).widget().deleteLater()
-
-        # load
-        for entry in self.container.bookmarks.bookmarks["bookmarks"]:
-
-            button = SgButton(entry['name'], self.widget)
-            button.setObjectName("SgBrowserShortCutsButton")
-            button.content = entry['url']
-            button.setCursor(qtpy.QtCore.Qt.PointingHandCursor)
-            button.clickedContent.connect(self.buttonClicked)
-            self.layout.insertWidget(self.layout.count()-1, button, 0,
-                                     qtpy.QtCore.Qt.AlignTop)
 
     def update(self, action: SgAction):
-        if action.state == SgBrowserStates.BookmarksModified:
-            self.reloadBookmarks()
-
-    def newExperimentClicked(self):
-        self.container.emit(SgBrowserStates.NewExperimentClicked)
+        pass
 
     def buttonClicked(self, path: str):
-        self.container.bookmarkPath = path
-        self.container.emit(SgBrowserStates.BookmarkOpenClicked)
+        self.container.currentPath = path
+        self.container.emit(SgBrowserStates.DirectoryModified)
 
     def get_widget(self): 
         return self.widget
@@ -213,7 +204,7 @@ class SgBrowserShortCutsComponent(SgComponent):
 
 class SgBrowserTableComponent(SgComponent):
     def __init__(self, container: SgBrowserContainer):
-        super(SgBrowserTableComponent, self).__init__()
+        super().__init__()
         self._object_name = 'SgBrowserTableComponent'
         self.container = container
         self.container.register(self)
@@ -232,9 +223,11 @@ class SgBrowserTableComponent(SgComponent):
         layout.addWidget(self.tableWidget)
 
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tableWidget.setAlternatingRowColors(True)
         self.tableWidget.setColumnCount(4)
         self.tableWidget.cellDoubleClicked.connect(self.cellDoubleClicked)
         self.tableWidget.cellClicked.connect(self.cellClicked)
+        self.tableWidget.verticalHeader().setDefaultSectionSize(12)
 
         labels = ['', 'Name', 'Date', 'Type']
         self.tableWidget.setHorizontalHeaderLabels(labels)
@@ -251,18 +244,8 @@ class SgBrowserTableComponent(SgComponent):
                 iconLabel = QLabel(self.tableWidget)
                 if fileInfo.type == "dir":
                     iconLabel.setObjectName("SgBrowserDirIcon")
-                elif fileInfo.type == "run":
-                    iconLabel.setObjectName("SgBrowserRunIcon")
                 elif fileInfo.type == "experiment":
                     iconLabel.setObjectName("SgBrowserExperimentIcon")
-                elif fileInfo.type == "rawdataset":
-                    iconLabel.setObjectName("SgBrowserRawDatSetIcon")
-                elif fileInfo.type == "processeddataset":
-                    iconLabel.setObjectName("SgBrowserProcessedDataSetIcon")
-                elif fileInfo.type == "rawdata":
-                    iconLabel.setObjectName("SgBrowserRawDatIcon")
-                elif fileInfo.type == "processeddata":
-                    iconLabel.setObjectName("SgBrowserProcessedDataIcon")
 
                 # icon
                 self.tableWidget.setCellWidget(i, 0, iconLabel)
@@ -272,22 +255,21 @@ class SgBrowserTableComponent(SgComponent):
                 self.tableWidget.setItem(i, 2, QTableWidgetItem(fileInfo.date))
                 # type
                 self.tableWidget.setItem(i, 3, QTableWidgetItem(fileInfo.type))
-            self.container.emit(SgBrowserStates.TableLoaded)
+            self.container.emit(SgBrowserStates.TableLoaded)    
             
     def cellDoubleClicked(self, row: int, col: int):
         self.container.doubleClickedRow = row
         self.container.emit(SgBrowserStates.ItemDoubleClicked)
         self.highlightLine(row)
 
-    def cellClicked(self, row: int, col: int):
+    def cellClicked(self, row : int, col : int):
         self.container.clickedRow = row
         self.container.emit(SgBrowserStates.ItemClicked)
         self.highlightLine(row)
 
     def highlightLine(self, row: int):
-        for col in range(4):
-            if self.tableWidget.item(row, col):
-                self.tableWidget.item(row, col).setSelected(True)    
+        for col in range(0, self.tableWidget.columnCount()):
+            self.tableWidget.setCurrentCell(row, col, qtpy.QtCore.QItemSelectionModel.Select)    
 
     def get_widget(self): 
         return self.widget   

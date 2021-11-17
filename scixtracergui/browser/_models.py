@@ -6,18 +6,15 @@ from qtpy.QtCore import QObject, QDir, QFileInfo
 from scixtracer import Experiment, Run, Dataset, RawData
 
 from scixtracergui.framework import SgModel, SgAction
-from scixtracergui.browser.states import SgBrowserStates
-from scixtracergui.browser.settings import SgBookmarks
-from scixtracergui.browser.containers import (SgBrowserContainer,
-                                              SgBrowserFileInfo)
+from ._states import SgBrowserStates
+from ._containers import (SgBrowserContainer,
+                          SgBrowserFileInfo)
 
 
 class SgBrowserModel(SgModel):
-    def __init__(self, container: SgBrowserContainer,
-                 useExperimentProcess: bool = False):
+    def __init__(self, container: SgBrowserContainer):
         super().__init__()
         self._object_name = 'SgBrowserModel'
-        self._useExperimentProcess = useExperimentProcess
         self.container = container
         self.container.register(self)
         self.files = list
@@ -33,20 +30,7 @@ class SgBrowserModel(SgModel):
             row = self.container.doubleClickedRow
             dcFile = self.container.files[row]
             self.browse(dcFile)
-            return
-
-        if action.state == SgBrowserStates.BookmarkOpenClicked:
-            fileInfoQt = QFileInfo(self.container.bookmarkPath)
-            dtype = 'file'
-            if fileInfoQt.isDir():
-                dtype = 'dir'    
-            fileInfo = SgBrowserFileInfo(fileInfoQt.fileName(),
-                                         fileInfoQt.path(),
-                                         fileInfoQt.fileName(),
-                                         dtype,
-                                         fileInfoQt.lastModified().toString(
-                                             "yyyy-MM-dd"))
-            self.browse(fileInfo)    
+            return   
 
         if action.state == SgBrowserStates.PreviousClicked:
             self.container.moveToPrevious()
@@ -66,20 +50,13 @@ class SgBrowserModel(SgModel):
             self.container.emit(SgBrowserStates.DirectoryModified)
             return
 
-        if action.state == SgBrowserStates.BookmarkClicked:
-            dir = QDir(self.container.currentPath)
-            self.container.bookmarks.set(dir.dirName(),
-                                         self.container.currentPath)
-            self.container.bookmarks.write()
-            self.container.emit(SgBrowserStates.BookmarksModified)
-            return
-
     def browse(self, fileInfo: SgBrowserFileInfo):
         experiment_file = os.path.join(fileInfo.path, fileInfo.fileName,
                                       'experiment.md.json')
         if os.path.isfile(experiment_file):
             self.container.openExperimentPath = os.path.join(fileInfo.path,
-                                                             fileInfo.fileName)
+                                                             fileInfo.fileName,
+                                                             'experiment.md.json')
             self.container.emit(SgBrowserStates.OpenExperiment)
         elif fileInfo.type == "dir":    
             self.container.setCurrentPath(os.path.join(fileInfo.path,
@@ -188,6 +165,3 @@ class SgBrowserModel(SgModel):
 
         self.container.files = self.files
         self.container.emit(SgBrowserStates.FilesInfoLoaded)
-
-    def loadBookmarks(self, file: str):
-        self.container.bookmarks = SgBookmarks(file)

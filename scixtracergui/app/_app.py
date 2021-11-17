@@ -7,6 +7,10 @@ from scixtracer.config import ConfigAccess
 from scixtracergui.framework import SgComponent, SgAction
 from scixtracergui.widgets import SgThemeAccess, SgAppBar, SgStaticStackedWidget
 from scixtracergui.home import SgHomeStates, SgHomeContainer, SgHomeComponent
+from scixtracergui.browser import (SgBrowserContainer, 
+                                   SgBrowserComponent,
+                                   SgBrowserModel,
+                                   SgBrowserStates)
 from scixtracergui.experiment import (SgExperimentCreateStates,
                                       SgExperimentCreateContainer, 
                                       SgExperimentCreateComponent,
@@ -24,19 +28,25 @@ class SciXtracerApp(SgComponent):
         # containers    
         self.homeContainer = SgHomeContainer()
         self.experimentCreateContainer = SgExperimentCreateContainer()
+        self.browserContainer = SgBrowserContainer()
 
         # components
         self.homeComponent = SgHomeComponent(self.homeContainer)
         self.experimentCreateComponent =  SgExperimentCreateComponent(self.experimentCreateContainer)
+        self.browserComponent = SgBrowserComponent(self.browserContainer)
 
         # models
         self.experimentCreateModel = SgExperimentCreateModel(self.experimentCreateContainer)
+        self.browserModel = SgBrowserModel(self.browserContainer)
 
         # register
         self.homeContainer.register(self)
         self.experimentCreateContainer.register(self)
+        self.browserContainer.register(self)
 
         # init
+        self.browserContainer.currentPath = str(Path.home())
+        self.browserContainer.emit(SgBrowserStates.DirectoryModified)
 
         # widgets
         self.widget = QWidget()
@@ -79,19 +89,12 @@ class SciXtracerApp(SgComponent):
             print('open new experiment from:', uri)
             self.open_experiment(uri)
             self.experimentCreateComponent.get_widget().setVisible(False) 
-        #elif action.state == BiHomeStates.OpenBrowser:
-        #    self.open_browser()
-        #elif action.state == SgHomeStates.OpenToolboxes:
-        #    self.open_toolboxes()
-        #elif action.state == SgBrowser2States.OpenExperiment:
-        #    self.open_experiment(self.browserContainer.openExperimentPath)   
+        elif action.state == SgHomeStates.OpenBrowser:
+            self.open_browser()
+        elif action.state == SgBrowserStates.OpenExperiment:
+             self.open_experiment(self.browserContainer.openExperimentPath)   
         elif action.state == SgHomeStates.OpenExperiment:
-            self.open_experiment(self.homeContainer.clicked_experiment) 
-        #elif action.state == SgFinderStates.OpenProcess:
-        #    tool_uri = self.finderContainer.clicked_tool
-        #    self.open_process(tool_uri)  
-        #elif action.state == SgExperimentStates.ProcessClicked:
-        #    self.open_toolboxes()                                  
+            self.open_experiment(self.homeContainer.clicked_experiment)                                 
 
     def open_experiment(self, uri):
         # instantiate
@@ -102,12 +105,6 @@ class SciXtracerApp(SgComponent):
                      SgThemeAccess.instance().icon('database'), 
                      "Experiment", True)    
                          
-
-    def open_process(self, uri):
-        #runner = SgRunnerViewApp(uri)
-        #self.add_tab(runner.get_widget(), SgThemeAccess.instance().icon('play'), 'Runner', True) 
-        print('the runner GUI is not yet implemented:', uri)
-
     def add_tab(self, widget, icon, name, closable=False):
         # fill tab and widget
         self.stackedWidget.addWidget(widget)
@@ -130,9 +127,7 @@ class SciXtracerApp(SgComponent):
 
     def open_browser(self):
         if self.browser_tab_id < 0:
-            widget = QLabel('Hello Browser')
-            widget.setObjectName('SgWidget')
-            self.stackedWidget.addWidget(self.BrowserComponent.get_widget())
+            self.stackedWidget.addWidget(self.browserComponent.get_widget())
             self.browser_tab_id = self.stackedWidget.count()-1
             self.mainBar.addButton(SgThemeAccess.instance().icon('open-folder_negative'), 
                                    "Browser", 

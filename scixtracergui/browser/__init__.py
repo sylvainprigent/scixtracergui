@@ -1,18 +1,9 @@
-from .components import (SgBrowserComponent, SgBrowserToolBarComponent,
-                         SgBrowserShortCutsComponent, SgBrowserTableComponent)
-from .settings import SgBookmarks
-from .states import SgBrowserStates
-from .containers import SgBrowserFileInfo, SgBrowserContainer
-from .models import SgBrowserModel
-
+from ._components import SgBrowserComponent
+from ._containers import SgBrowserContainer
+from ._states import SgBrowserStates
+from ._models import SgBrowserModel
 
 __all__ = ['SgBrowserComponent',
-           'SgBrowserToolBarComponent',
-           'SgBrowserShortCutsComponent',
-           'SgBrowserTableComponent',
-           'SgBookmarks',
-           'SgBrowserStates',
-           'SgBrowserFileInfo',
            'SgBrowserContainer',
-           'SgBrowserModel'
-           ]
+           'SgBrowserStates',
+           'SgBrowserModel']

@@ -1,13 +1,12 @@
 import os
 
 from scixtracergui.framework import SgContainer, SgObject
-from scixtracergui.browser.settings import SgBookmarks
 
 
-class SgBrowserFileInfo(SgObject):
+class SgBrowserFileInfo(SgObject):     
     def __init__(self, fileName: str = '', path: str = '', name: str = '',
                  dtype: str = '', date: str = ''):
-        super(SgBrowserFileInfo, self).__init__()
+        super().__init__()
         self.fileName = fileName
         self.path = path # without file name 
         self.name = name
@@ -31,7 +30,6 @@ class SgBrowserContainer(SgContainer):
         self.clickedRow = -1
         self.historyPaths = list()
         self.posHistory = 0
-        self.bookmarks = SgBookmarks()
         self.openExperimentPath = ''
         self.bookmarkPath = ''
 
@@ -46,7 +44,7 @@ class SgBrowserContainer(SgContainer):
 
     def moveToPrevious(self):
         self.posHistory -= 1
-        if self.posHistory < 0:
+        if self.posHistory < 0 :
             self.posHistory = 0
         self.currentPath = self.historyPaths[self.posHistory]
 
@@ -62,4 +60,4 @@ class SgBrowserContainer(SgContainer):
             for i in range(len(self.historyPaths), self.posHistory):
                 self.historyPaths.pop(i)
         self.addHistory(path)
-        self.posHistory = len(self.historyPaths) - 1   
+        self.posHistory = len(self.historyPaths) - 1

@@ -687,7 +687,13 @@ QTableView {
   alternate-background-color: #313339;
   color: #d1d1d1;
   background-color: #262930;
-  selection-background-color: #414851;
+  selection-background-color: #0071C3;
+}
+
+QTableWidget::item:selected 
+{
+  background: #0071C3;
+  color: #f0f1f2;
 }
 
 QHeaderView::section {
@@ -697,7 +703,7 @@ QHeaderView::section {
   padding: 4px;
   font-size: 14pt;
   border-style: none;
-  min-height: 30px;
+  min-height: 20px;
   min-width: 10px;
 }
 
@@ -729,6 +735,7 @@ QTableView QTableCornerButton::section{
 QHeaderView {
 	background-color: #262930;
 }
+
 
 /*
 btnTablePrimary
@@ -799,7 +806,7 @@ QSplitter{
 }
 
 QSplitter::handle {
-    background-color:#000000;
+    background-color:#414851;
 }
 
 QSplitter::handle:horizontal {
@@ -811,7 +818,7 @@ QSplitter::handle:vertical {
 }
 
 QSplitter::handle:pressed {
-    background-color:#d1d1d1;
+    background-color:#0071C3;
 }
 
 /*////////////////////////////////////////////////////////////////////////////
@@ -1262,7 +1269,8 @@ QLabel#SgBrowserRunIcon{
 }
 
 QLabel#SgBrowserExperimentIcon{
-  image: url(folder-white-shape.svg);
+  padding: 2px 2px 2px 2px;
+  image: url(database.svg);
 }
 
 QLabel#SgBrowserRawDatSetIcon{
@@ -1606,7 +1614,7 @@ QLabel#SgHomeEmpty{
 
 QPushButton#SgHomeToolBarButton{
 	border: none;
-  min-height: 40px;
+  min-height: 40px; 
   max-height: 40px;
   max-width: 40px;
   min-width: 40px;
@@ -1627,4 +1635,90 @@ QPushButton#SgHomeToolBarButton:checked{
 }
 QPushButton#SgHomeToolBarButton:disabled{
 	background-color: #5A626C;
+}
+
+/* ****************************************
+*            Browser
+*******************************************/
+QToolButton#SgBrowserBarHomeButton{
+  image: url(home.svg);
+}
+QToolButton#SgBrowserToolBarPreviousButton{
+  image: url(arrow-pointing-to-left.svg);
+}
+QToolButton#SgBrowserToolBarNextButton{
+  image: url(arrow-pointing-to-right.svg);
+}
+QToolButton#SgBrowserToolBarUpButton{
+  image: url(arrow-up.svg);
+}
+QToolButton#SgBrowserToolBarRefreshButton{
+  image: url(refresh-arrow.svg);
+}
+
+QLabel#SgBrowserDirIcon{
+  image: url(open-folder.svg);
+}
+
+QLabel#SgBrowserExperimentIcon{
+  image: url(database_primary.svg);
+}
+
+QPushButton#SgBrowserHomeButton {
+  image: url(home.svg);
+  padding: 2px 4px;
+  font-size: 14px;
+  color: #f0f1f2;
+  background-color: #414851;
+  border-radius: 4px;
+  text-align: left;
+}
+
+QPushButton#SgBrowserHomeButton:hover{
+  background-color: #5A626C;
+}
+
+QPushButton#SgBrowserDesktopButton {
+  padding: 2px 4px;
+  font-size: 14px;
+  color: #f0f1f2;
+  background-color: #414851;
+  border-radius: 4px;
+  text-align: left;
+  image: url(home.svg);
+}
+
+QPushButton#SgBrowserDesktopButton:hover{
+  background-color: #5A626C;
+}
+
+QPushButton#SgBrowserDocumentsButton
+{
+  padding: 2px 4px;
+  font-size: 14px;
+  color: #f0f1f2;
+  background-color: #414851;
+  border-radius: 4px;
+  text-align: left;
+  image: url(home.svg);
+}
+
+QWidget#SgShortcutButton
+{
+  margin-left: 12px;
+  font-size: 14px;
+  color: #f0f1f2;
+  background-color: #414851;
+  border-radius: 4px;
+  text-align: left;
+}
+
+#SgShortcutButton QPushButton
+{
+  padding: 2px 4px;
+  font-size: 14px;
+  color: #f0f1f2;
+  background-color: #414851;
+  border-radius: 4px;
+  text-align: left;
 }
